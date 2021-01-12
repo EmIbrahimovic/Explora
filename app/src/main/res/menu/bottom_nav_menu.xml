@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/title_home" />
+
+    <item
+        android:id="@+id/navigation_listen"
+        android:icon="@drawable/ic_listen"
+        android:title="@string/title_listen" />
+
+    <item
+        android:id="@+id/navigation_activity"
+        android:icon="@drawable/ic_playlist"
+        android:title="@string/title_activity" />
+
+    <item
+        android:id="@+id/navigation_question"
+        android:icon="@drawable/ic_question"
+        android:title="@string/title_question" />
+
+</menu>

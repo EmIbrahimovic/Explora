@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Explora</string>
+    <string name="title_home">Home</string>
+    <string name="title_listen">Listen</string>
+    <string name="title_activity">Activity</string>
+    <string name="title_question">Question</string>
+    <string name="home_description">
+        Korado Korlević u Explori odgovora na brojna pitanja i zagonetke
+        svijeta oko nas. Zanimljive i kontroverzne teme, znanstve novosti, povijesne zagonetke i
+        trendovi razvoja tehnologije. U emisiju se svojim pitanjima mogu uključiti i slušatelji. \n
+        Urednik i voditelj Elvis Mileta.
+    </string>
+    <string name="visnjan_observatory">Višnjan Observatory</string>
+    <string name="croatian_radio">Croatian Radio</string>
+    <string name="question_subject">Subject</string>
+    <string name="send_question_email">Send Email</string>
+    <string name="question_body">Question Body…</string>
+    <string name="episode_title">Episode Title</string>
+    <string name="episode_desctipion">Ovu godinu treba čim prije zaboraviti, slaviti ćemo odlazak stare a ne doček Nove. Rekapitulacija odlazeće godine, što se značajno dogodilo u znanosti, astronomiji, osvajanju Svemira i tehnologiji. Što nas očekuje u ovim oblastima u 2021. godini? NAPOMENA: emisija je snimljena 28.prosinca navečer.</string>
+    <string name="episode_last_time">0 min 0 s</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.personal.project.explora.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_listen"
+        android:name="com.personal.project.explora.ui.listen.ListenFragment"
+        android:label="@string/title_listen"
+        tools:layout="@layout/fragment_listen" />
+
+    <fragment
+        android:id="@+id/navigation_activity"
+        android:name="com.personal.project.explora.ui.activity.ActivityFragment"
+        android:label="@string/title_activity"
+        tools:layout="@layout/fragment_activity" />
+
+    <fragment
+        android:id="@+id/navigation_question"
+        android:name="com.personal.project.explora.ui.question.QuestionFragment"
+        android:label="@string/title_question"
+        tools:layout="@layout/fragment_question" />
+
+</navigation>
