@@ -16,20 +16,20 @@ import com.personal.project.explora.R;
 
 public class ListenFragment extends Fragment {
 
-    private ListenViewModel listenViewModel;
+//    private ListenViewModel listenViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        listenViewModel =
-                ViewModelProviders.of(this).get(ListenViewModel.class);
+//        listenViewModel =
+//                ViewModelProviders.of(this).get(ListenViewModel.class);
         View root = inflater.inflate(R.layout.fragment_listen, container, false);
         final TextView textView = root.findViewById(R.id.text_listen);
-        listenViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+//        listenViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
         return root;
     }
 }

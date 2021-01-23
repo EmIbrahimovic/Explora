@@ -1,20 +1,17 @@
 package com.personal.project.explora.ui.listen;
 
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.personal.project.explora.Episode;
-import com.personal.project.explora.EpisodePopupItemClickListener;
 import com.personal.project.explora.R;
+import com.personal.project.explora.db.Episode;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +35,11 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeH
 
         holder.textViewTitle.setText(currentEpisode.getTitle());
         holder.textViewDescription.setText(currentEpisode.getDescription());
-        // TODO add episode holder things, figure out image etc.
-
-        // TODO add onclick listeners for
-
-
+        holder.textViewLastTime.setText(currentEpisode.getLength());
+        Picasso.get()
+                .load(currentEpisode.getImage())
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(holder.image);
     }
 
     @Override
@@ -64,9 +61,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeH
         private TextView textViewDescription;
         private TextView textViewLastTime;
         private ImageView image;
-        private ImageButton buttonMore;
-        private ImageButton buttonPlay;
-        private ImageButton buttonShare;
 
         public EpisodeHolder(@NonNull View itemView) {
             super(itemView);
@@ -75,25 +69,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeH
             textViewDescription = itemView.findViewById(R.id.episode_description);
             textViewLastTime = itemView.findViewById(R.id.episode_last_time);
             image = itemView.findViewById(R.id.episode_image);
-            buttonMore = itemView.findViewById(R.id.episode_more_button);
-            buttonPlay = itemView.findViewById(R.id.episode_play_button);
-            buttonShare = itemView.findViewById(R.id.episode_share_button);
-
-            buttonMore.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showPopupMenu(buttonMore, getAdapterPosition());
-                }
-            });
         }
-    }
-
-    private void showPopupMenu(View view, int position) {
-        PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
-        MenuInflater inflater = popupMenu.getMenuInflater();
-
-        inflater.inflate(R.menu.episode_popup_menu, popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(new EpisodePopupItemClickListener(position));
-        popupMenu.show();
     }
 }

@@ -3,7 +3,7 @@ package com.personal.project.explora.ui.listen;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.personal.project.explora.Episode;
+import com.personal.project.explora.db.Episode;
 
 import java.util.List;
 

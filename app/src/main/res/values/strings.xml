@@ -18,4 +18,6 @@
     <string name="episode_title">Episode Title</string>
     <string name="episode_desctipion">Ovu godinu treba čim prije zaboraviti, slaviti ćemo odlazak stare a ne doček Nove. Rekapitulacija odlazeće godine, što se značajno dogodilo u znanosti, astronomiji, osvajanju Svemira i tehnologiji. Što nas očekuje u ovim oblastima u 2021. godini? NAPOMENA: emisija je snimljena 28.prosinca navečer.</string>
     <string name="episode_last_time">0 min 0 s</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
