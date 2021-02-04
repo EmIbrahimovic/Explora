@@ -41,10 +41,10 @@ public class BasicApp extends Application {
     }
 
     public EpisodeDatabase getDatabase() {
-        if(AppStartUtil.checkAppStart(this, sharedPreferences) == AppStartUtil.AppStart.FIRST_TIME_VERSION)
-            return EpisodeDatabase.getInstanceFromAsset(this);
+        if(AppStartUtil.checkAppStart(this, sharedPreferences) == AppStartUtil.AppStart.NORMAL)
+            return EpisodeDatabase.getInstance(this);
 
-        return EpisodeDatabase.getInstance(this);
+        return EpisodeDatabase.getInstanceFromAsset(this);
     }
 
     public EpisodeRepository getRepository() {

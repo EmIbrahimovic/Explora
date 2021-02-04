@@ -15,6 +15,7 @@ import com.personal.project.explora.feed.FeedAPI;
 import com.personal.project.explora.feed.Rss;
 import com.personal.project.explora.utils.ObjectUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,12 +166,14 @@ public class EpisodeRepository {
     private void updateDB(List<Episode> recentEpisodes) {
 
         mExecutors.diskIO().execute(() -> {
+            List<Episode> toInsert = new ArrayList<>();
             for (Episode recentEpisode : recentEpisodes) {
                 Episode lookup = episodeDao.getEpisodeByTitle(recentEpisode.getTitle());
 
                 if (lookup == null) {
                     if (!ObjectUtil.isEmpty(recentEpisode.getLink())) {
-                        episodeDao.insert(recentEpisode);
+                        toInsert.add(recentEpisode);
+                        //insert(recentEpisode);
                     }
                 }
                 else if (lookup.getLastUpdated().equals(recentEpisode.getLastUpdated())) {
@@ -187,8 +190,11 @@ public class EpisodeRepository {
                     episodeDao.update(lookup);
                 }
             }
-        });
 
+            for (int i = toInsert.size() - 1; i >= 0; i--) {
+                insert(toInsert.get(i));
+            }
+        });
     }
 
 }

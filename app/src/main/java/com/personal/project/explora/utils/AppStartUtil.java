@@ -35,16 +35,19 @@ public class AppStartUtil {
         PackageInfo pInfo;
 
         try {
-            pInfo = context.getPackageManager().getPackageInfo(
-                    context.getPackageName(), 0);
-            int lastVersionCode = sharedPreferences.getInt(
-                    LAST_APP_VERSION, -1);
-            int currentVersionCode = pInfo.versionCode;
+            pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            long lastVersionCode = sharedPreferences.getLong(LAST_APP_VERSION, -1);
+            long currentVersionCode = 0;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                currentVersionCode = pInfo.getLongVersionCode();
+            } else {
+                currentVersionCode = pInfo.versionCode;
+            }
             appStart = checkAppStart(currentVersionCode, lastVersionCode);
 
             // Update version in preferences
             sharedPreferences.edit()
-                    .putInt(LAST_APP_VERSION, currentVersionCode).commit(); // must use commit here or app may not update prefs in time and app will loop into walkthrough
+                    .putLong(LAST_APP_VERSION, currentVersionCode).commit(); // must use commit here or app may not update prefs in time and app will loop into walkthrough
         } catch (PackageManager.NameNotFoundException e) {
             Log.w(TAG,
                     "Unable to determine current app version from package manager. Defensively assuming normal app start.");
@@ -52,7 +55,7 @@ public class AppStartUtil {
         return appStart;
     }
 
-    public static AppStart checkAppStart(int currentVersionCode, int lastVersionCode) {
+    public static AppStart checkAppStart(long currentVersionCode, long lastVersionCode) {
         if (lastVersionCode == -1) {
             return AppStart.FIRST_TIME;
         } else if (lastVersionCode < currentVersionCode) {
