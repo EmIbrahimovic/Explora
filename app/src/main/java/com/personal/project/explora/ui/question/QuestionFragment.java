@@ -3,11 +3,13 @@ package com.personal.project.explora.ui.question;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.opengl.ETC1;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,6 +27,14 @@ public class QuestionFragment extends Fragment {
 
     private QuestionViewModel questionViewModel;
     Button buttonMail;
+    EditText subject;
+    EditText question;
+
+    /*
+
+    PUT ALL TEXT IN THE SAVED INSTANCE STATE
+
+     */
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -34,14 +44,16 @@ public class QuestionFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_question, container, false);
         buttonMail = root.findViewById(R.id.button_mail);
+        subject = root.findViewById(R.id.edit_text_subject);
+        question = root.findViewById(R.id.edit_text_body);
 
         buttonMail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent mailIntent = createEmailIntent(
                         "emira.ibrahimovic@hotmail.com",
-                        "Subject",
-                        "Body...");
+                        subject.getText().toString(),
+                        question.getText().toString());
 
                 startActivity(mailIntent);
             }

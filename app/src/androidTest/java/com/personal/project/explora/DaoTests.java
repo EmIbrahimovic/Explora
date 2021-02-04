@@ -126,4 +126,16 @@ public class DaoTests {
         //dao.delete(EPISODE);
     }
 
+    @Test
+    public void seeWhatHappensWhenDataIsntThere() {
+        Episode episode = dao.getEpisode(3000);
+        Log.d(TAG, "seeWhatHappensWhenDataIsntThere: " + episode);
+    }
+
+    @Test
+    public void seeWhatHappensWhenDataIsntThere2() {
+        Episode episode = dao.getEpisodeByTitle("nonexistent title");
+        Log.d(TAG, "seeWhatHappensWhenDataIsntThere2: " + episode);
+    }
+
 }

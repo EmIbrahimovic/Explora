@@ -21,6 +21,9 @@ public interface EpisodeDao {
     @Delete
     void delete(Episode episode);
 
+    @Query("select DISTINCT year from episodes_table ORDER BY year DESC")
+    LiveData<List<Integer>> getYears();
+
     @Query("select * from episodes_table where year = :requestedYear")
     LiveData<List<Episode>> getEpisodesFromYear(int requestedYear);
 
@@ -29,4 +32,10 @@ public interface EpisodeDao {
 
     @Query("select * from episodes_table where id = :episode_id")
     Episode getEpisode(int episode_id);
+
+    @Query("select * from episodes_table where title = :title")
+    Episode getEpisodeByTitle(String title);
+
+    @Query("SELECT * from episodes_table order by year DESC")
+    LiveData<List<Episode>> getAllEpisodes();
 }

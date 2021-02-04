@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e2c85c2eefbd809ee975afa19ff19f74",
+    "identityHash": "4c7dce48eb6737030dd0460a7359bb5e",
     "entities": [
       {
         "tableName": "episodes_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `title` TEXT, `description` TEXT, `length` TEXT, `link` TEXT, `image` TEXT, `downloadId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `title` TEXT, `description` TEXT, `length` TEXT, `link` TEXT, `image` TEXT, `lastUpdated` TEXT, `downloadId` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -51,6 +51,12 @@
             "notNull": false
           },
           {
+            "fieldPath": "lastUpdated",
+            "columnName": "lastUpdated",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "downloadId",
             "columnName": "downloadId",
             "affinity": "INTEGER",
@@ -70,7 +76,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e2c85c2eefbd809ee975afa19ff19f74')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4c7dce48eb6737030dd0460a7359bb5e')"
     ]
   }
 }

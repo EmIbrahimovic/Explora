@@ -8,9 +8,9 @@ import java.util.List;
 public class TestData {
 
     static final Episode EPISODE = new Episode(3000, "title1",
-            "desc1", "1h",  "link1.com", "image1.jpg");
+            "desc1", "1h",  "link1.com", "image1.jpg", "01.01.2049.");
     static final Episode EPISODE2 = new Episode(3000, "title2",
-            "desc2", "2h",  "link2.com", "image2.jpg");
+            "desc2", "2h",  "link2.com", "image2.jpg", "");
 
     static final List<Episode> EPISODES = Arrays.asList(EPISODE, EPISODE2);
 }

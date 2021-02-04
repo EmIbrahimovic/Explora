@@ -14,11 +14,24 @@ public abstract class EpisodeDatabase extends RoomDatabase {
     private static EpisodeDatabase instance;
 
     @VisibleForTesting
-    public static final String DATABASE_NAME = "episode-db";
+    public static final String DATABASE_NAME = "episodes-table";
 
     public abstract EpisodeDao episodeDao();
 
     private final MutableLiveData<Boolean> mIsDatabaseCreated = new MutableLiveData<>();
+
+    public static EpisodeDatabase getInstanceFromAsset(Context context) {
+        if (instance == null) {
+            synchronized (EpisodeDatabase.class) {
+                if (instance == null) {
+                    instance = buildDatabaseFromAsset(context.getApplicationContext());
+                    instance.updateDataBaseCreated(context.getApplicationContext());
+                }
+            }
+        }
+
+        return instance;
+    }
 
     public static EpisodeDatabase getInstance(Context context) {
         if (instance == null) {
@@ -33,12 +46,22 @@ public abstract class EpisodeDatabase extends RoomDatabase {
         return instance;
     }
 
+    private static EpisodeDatabase buildDatabaseFromAsset(Context appContext) {
+
+        return Room.databaseBuilder(appContext,
+                EpisodeDatabase.class, DATABASE_NAME)
+                .fallbackToDestructiveMigration()
+                .createFromAsset("databases/episodes_table.db")
+                .build();
+
+    }
+
+
     private static EpisodeDatabase buildDatabase(Context appContext) {
 
         return Room.databaseBuilder(appContext,
                 EpisodeDatabase.class, DATABASE_NAME)
                 .fallbackToDestructiveMigration()
-                .createFromAsset("database/explora.db")
                 .build();
 
     }
