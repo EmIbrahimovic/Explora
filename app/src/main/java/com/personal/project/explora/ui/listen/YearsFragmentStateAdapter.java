@@ -6,12 +6,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import static com.personal.project.explora.utils.YearsData.YEARS;
+
 public class YearsFragmentStateAdapter extends FragmentStateAdapter {
 
     private static final String TAG = "YearsFragmentStateAdapt";
 
     // TODO: FIND A WAY TO DYNAMICALLY ASSIGN YEARS
-    public static final int[] mYears = { 2021, 2020, 2019, 2018, 2017 };
 
     public YearsFragmentStateAdapter(@NonNull Fragment fragment) {
         super(fragment);
@@ -20,16 +21,15 @@ public class YearsFragmentStateAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        Log.d(TAG, "createFragment: " + position + " " + mYears[position]);
-        return YearFragment.newInstance(mYears[position]);
+        return YearFragment.newInstance(YEARS[position]);
     }
 
     @Override
     public int getItemCount() {
-        return mYears.length;
+        return YEARS.length;
     }
 
     public String getItemTitle(int position) {
-        return String.valueOf(mYears[position]);
+        return String.valueOf(YEARS[position]);
     }
 }

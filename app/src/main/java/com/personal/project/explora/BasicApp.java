@@ -17,10 +17,15 @@
 package com.personal.project.explora;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.personal.project.explora.db.EpisodeDatabase;
+import com.personal.project.explora.service.PlayerServiceConnection;
 import com.personal.project.explora.utils.AppStartUtil;
 
 /**
@@ -28,16 +33,25 @@ import com.personal.project.explora.utils.AppStartUtil;
  */
 public class BasicApp extends Application {
 
+    private static final String TAG = "BasicApp";
+
     private AppExecutors mAppExecutors;
 
     SharedPreferences sharedPreferences;
+
+    public BasicApp() {
+        mAppExecutors = new AppExecutors();
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        mAppExecutors = new AppExecutors();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+    }
+
+    public AppExecutors getAppExecutors() {
+        return mAppExecutors;
     }
 
     public EpisodeDatabase getDatabase() {
@@ -49,6 +63,17 @@ public class BasicApp extends Application {
 
     public EpisodeRepository getRepository() {
         return EpisodeRepository.getInstance(this, mAppExecutors);
+    }
+
+    public PlayerServiceConnection getPlayerServiceConnection() {
+        return PlayerServiceConnection.getInstance(this);
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
     }
 
 }

@@ -1,7 +1,9 @@
 package com.personal.project.explora;
 
 import android.app.Application;
-import android.content.Context;
+import android.media.MediaMetadataRetriever;
+import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -13,7 +15,9 @@ import com.personal.project.explora.db.EpisodeDatabase;
 import com.personal.project.explora.feed.Channel;
 import com.personal.project.explora.feed.FeedAPI;
 import com.personal.project.explora.feed.Rss;
-import com.personal.project.explora.utils.ObjectUtil;
+import com.personal.project.explora.utils.StringUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +46,6 @@ public class EpisodeRepository {
 
     private Map<Integer, LiveData<List<Episode>>> allEpisodes;
     private List<Episode> recents;
-    private String feedLastUpdate;
 
     private MutableLiveData<Integer> networkOperationSucceeded;
     public static final int SUCCESS = 1;
@@ -112,6 +115,14 @@ public class EpisodeRepository {
         return allEpisodes;
     }
 
+    public LiveData<List<Episode>> getRecentEpisodes() {
+        return episodeDao.getRecentEpisodes();
+    }
+
+    public LiveData<List<Episode>> getDownloadedEpisodes() {
+        return episodeDao.getDownloadedEpisodes();
+    }
+
     public LiveData<Integer> getNetworkOperationStatus() {
         return networkOperationSucceeded;
     }
@@ -125,23 +136,58 @@ public class EpisodeRepository {
     }
 
     public void update(final Episode episode) {
-        mExecutors.diskIO().execute(() -> episodeDao.update(episode));
+        mExecutors.diskIO().execute(() -> {
+            episodeDao.update(episode);
+            Log.d(TAG, "update: updated this guy " + episode);
+        });
     }
 
     /*public void delete(final Episode episode) {
         mExecutors.diskIO().execute(() -> episodeDao.delete(episode));
     }*/
 
+//    public void getEpisodeFromId(int id, EpisodeRetrievedListener listener) {
+//        mExecutors.diskIO().execute(() -> {
+//            Episode episode = episodeDao.getEpisodeSync(id);
+//            listener.onEpisodeRetrieved(episode);
+//        });
+//    }
+
+    /** very special use case with a probably better solution but hey */
+    public void getEpisodeFromIdForPrepare(int id, EpisodeRetrievedListenerForPrepare listener,
+                                           boolean playWhenReady, Bundle extras) {
+        mExecutors.diskIO().execute(() -> {
+            Episode episode = episodeDao.getEpisodeSync(id);
+            Log.d(TAG, "getEpisodeFromIdForPrepare: needed episode with id=" + id + "; gotten episode=" + episode);
+            listener.getHandler().post(
+                    () -> listener.onEpisodeRetrieved(episode, playWhenReady, extras));
+        });
+    }
+
+
+    public void getFromIdAndUpdateDownloadId(int id, int downloadId) {
+        if (id < 0 || !Episode.isValidDownloadId(downloadId))
+            return;
+
+        mExecutors.diskIO().execute(() -> {
+            Episode episode = episodeDao.getEpisodeSync(id);
+            episode.setDownloadState(downloadId);
+            update(episode);
+        });
+    }
+
     /*
         NETWORK OPERATIONS
      */
 
-    private void refreshRecents() {
+    public void refreshRecents() {
+
+        networkOperationSucceeded.postValue(LOADING);
 
         Call<Rss> rssCall = feedAPI.getRss(FEED_URL);
         rssCall.enqueue(new Callback<Rss>() {
             @Override
-            public void onResponse(Call<Rss> call, Response<Rss> response) {
+            public void onResponse(@NotNull Call<Rss> call, @NotNull Response<Rss> response) {
                 Log.d(TAG, "onResponse: " + response.code());
                 if (!response.isSuccessful() || response.body() == null) {
                     networkOperationSucceeded.postValue(FAILURE);
@@ -150,13 +196,13 @@ public class EpisodeRepository {
 
                 Channel channel = response.body().getChannel();
                 recents = channel.getEpisodes();
-                feedLastUpdate = channel.getLastBuildDate();
+
+                // updateDB posts success
                 updateDB(recents);
-                networkOperationSucceeded.postValue(SUCCESS);
             }
 
             @Override
-            public void onFailure(Call<Rss> call, Throwable t) {
+            public void onFailure(@NotNull Call<Rss> call, @NotNull Throwable t) {
                 Log.e(TAG, "onFailure: Unable to retrieve RSS " + t.getMessage());
                 networkOperationSucceeded.postValue(FAILURE);
             }
@@ -169,11 +215,11 @@ public class EpisodeRepository {
             List<Episode> toInsert = new ArrayList<>();
             for (Episode recentEpisode : recentEpisodes) {
                 Episode lookup = episodeDao.getEpisodeByTitle(recentEpisode.getTitle());
+                recentEpisode.setDuration(getDuration(recentEpisode));
 
                 if (lookup == null) {
-                    if (!ObjectUtil.isEmpty(recentEpisode.getLink())) {
+                    if (!StringUtils.isEmpty(recentEpisode.getLink())) {
                         toInsert.add(recentEpisode);
-                        //insert(recentEpisode);
                     }
                 }
                 else if (lookup.getLastUpdated().equals(recentEpisode.getLastUpdated())) {
@@ -181,20 +227,37 @@ public class EpisodeRepository {
                 }
                 else if (recentEpisode.completes(lookup)) {
 
-                    lookup.completeWith(recentEpisode);
+                    lookup.completeContentWith(recentEpisode);
 
-                    if (lookup.getDownloadId() != Episode.NOT_DOWNLOADED) {
-                        // TODO choose behaviour for when an updated episode was already downloaded
-                    }
-
-                    episodeDao.update(lookup);
+                    update(lookup);
                 }
             }
 
             for (int i = toInsert.size() - 1; i >= 0; i--) {
                 insert(toInsert.get(i));
             }
+
+            mExecutors.diskIO().execute(() -> networkOperationSucceeded.postValue(SUCCESS));
         });
+    }
+
+    private long getDuration(Episode episode) {
+
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(episode.getLink(), new HashMap<>());
+
+        return Long.parseLong(
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+    }
+
+    public interface EpisodeRetrievedListenerForPrepare {
+        Handler getHandler();
+
+        void onEpisodeRetrieved(Episode episode, boolean playWhenReady, Bundle extras);
+    }
+
+    public interface EpisodeRetrievedListener {
+        void onEpisodeRetrieved(Episode episode);
     }
 
 }

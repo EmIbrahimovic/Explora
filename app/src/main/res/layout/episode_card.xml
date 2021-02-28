@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="episode_title,episode_more_button"
+            app:constraint_referenced_ids="episode_title,episode_menu_button"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="227dp" />
 
@@ -33,12 +33,12 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/episode_more_button"
+            android:id="@+id/episode_menu_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:background="@null"
+            android:background="?android:attr/selectableItemBackground"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:src="@drawable/ic_more"
@@ -74,7 +74,7 @@
             app:srcCompat="@drawable/ic_baseline_play_arrow_24" />
 
         <TextView
-            android:id="@+id/episode_last_time"
+            android:id="@+id/episode_last_position"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 min 0 s"
@@ -85,7 +85,7 @@
             android:id="@+id/episode_share_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@null"
+            android:background="?android:attr/selectableItemBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/episode_description"
             app:srcCompat="@drawable/ic_share" />

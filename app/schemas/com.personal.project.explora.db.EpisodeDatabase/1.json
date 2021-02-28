@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4c7dce48eb6737030dd0460a7359bb5e",
+    "identityHash": "8a7da5364c26cd7036cb8d9078e83ed8",
     "entities": [
       {
         "tableName": "episodes_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `title` TEXT, `description` TEXT, `length` TEXT, `link` TEXT, `image` TEXT, `lastUpdated` TEXT, `downloadId` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `title` TEXT, `description` TEXT, `link` TEXT, `downloadId` INTEGER NOT NULL, `lastUpdated` TEXT, `lastPosition` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `recent` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -33,26 +33,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "length",
-            "columnName": "length",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
             "fieldPath": "link",
             "columnName": "link",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "image",
-            "columnName": "image",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "lastUpdated",
-            "columnName": "lastUpdated",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -61,6 +43,30 @@
             "columnName": "downloadId",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "lastUpdated",
+            "columnName": "lastUpdated",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastPosition",
+            "columnName": "lastPosition",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recent",
+            "columnName": "recent",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -76,7 +82,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4c7dce48eb6737030dd0460a7359bb5e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8a7da5364c26cd7036cb8d9078e83ed8')"
     ]
   }
 }

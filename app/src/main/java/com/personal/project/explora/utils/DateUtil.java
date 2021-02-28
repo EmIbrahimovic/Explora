@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -37,6 +38,18 @@ public class DateUtil {
     public static String formatMyDate(@NonNull LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
         return date.format(formatter);
+    }
+
+    public static int compareStringDateTimes(String A, String B) {
+        LocalDateTime a = LocalDateTime.parse(A);
+        LocalDateTime b = LocalDateTime.parse(B);
+        if (a.isEqual(b))
+            return 0;
+
+        if (a.isBefore(b))
+            return 1;
+
+        return -1;
     }
 
 }

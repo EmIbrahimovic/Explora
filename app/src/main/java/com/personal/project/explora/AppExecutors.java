@@ -2,6 +2,7 @@ package com.personal.project.explora;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -28,6 +29,7 @@ public class AppExecutors {
     public AppExecutors() {
         this(Executors.newSingleThreadExecutor(), Executors.newFixedThreadPool(3),
                 new MainThreadExecutor());
+        Log.d("AppExecutors", "AppExecutors: created");
     }
 
     public Executor diskIO() {

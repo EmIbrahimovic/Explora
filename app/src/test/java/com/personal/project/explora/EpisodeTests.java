@@ -41,17 +41,17 @@ public class EpisodeTests {
     public void completeEpisodeIsComplete() {
         episode.setId(1);
         episode2.setId(2);
-        assertTrue(episode.isComplete());
-        assertTrue(episode2.isComplete());
+        assertTrue(episode.isContentComplete());
+        assertTrue(episode2.isContentComplete());
     }
 
     @Test
     public void incompleteEpisodeIsNotComplete() {
         inepisode.setId(1);
         inepisode2.setId(2);
-        assertFalse(inepisode.isComplete());
-        assertFalse(inepisode2.isComplete());
-        assertFalse(inepisode3.isComplete());
+        assertFalse(inepisode.isContentComplete());
+        assertFalse(inepisode2.isContentComplete());
+        assertFalse(inepisode3.isContentComplete());
     }
 
     @Test
@@ -84,8 +84,8 @@ public class EpisodeTests {
         episode.setId(1);
         episode2.setId(2);
 
-        inepisode.completeWith(episode);
-        inepisode2.completeWith(episode2);
+        inepisode.completeContentWith(episode);
+        inepisode2.completeContentWith(episode2);
         assertEquals(inepisode, episode);
         assertEquals(inepisode2, episode2);
     }
@@ -95,8 +95,8 @@ public class EpisodeTests {
         inepisode.setId(1);
         inepisode2.setId(2);
 
-        inepisode.completeWith(enepisode);
-        inepisode2.completeWith(enepisode2);
+        inepisode.completeContentWith(enepisode);
+        inepisode2.completeContentWith(enepisode2);
 
         Episode result1 = new Episode(3000, "title1",
                 "desc1", "1h",  "link1.com", "image1.jpg", "01.01.2048.");

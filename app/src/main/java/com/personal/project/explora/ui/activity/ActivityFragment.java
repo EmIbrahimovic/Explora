@@ -4,32 +4,50 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.personal.project.explora.R;
+import com.personal.project.explora.databinding.FragmentActivityBinding;
 
 public class ActivityFragment extends Fragment {
 
-    private ActivityViewModel activityViewModel;
+    private FragmentActivityBinding mBinding;
+
+    private ActivityViewModel mViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        activityViewModel =
-                ViewModelProviders.of(this).get(ActivityViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_activity, container, false);
-        final TextView textView = root.findViewById(R.id.text_activity);
-        activityViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        return root;
+        mViewModel =
+                new ViewModelProvider(this).get(ActivityViewModel.class);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_activity, container, false);
+
+        return mBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        ActivityFragmentStateAdapter mViewPagerAdapter = new ActivityFragmentStateAdapter(this);
+        ViewPager2 mViewPager = mBinding.activityViewPager;
+        mViewPager.setAdapter(mViewPagerAdapter);
+
+        TabLayout tabs = mBinding.activityTabs;
+        new TabLayoutMediator(tabs, mViewPager,
+                (tab, position) -> tab.setText(mViewPagerAdapter.getItemTitle(position))).attach();
+    }
+
+    @Override
+    public void onDestroyView() {
+        mBinding = null;
+        super.onDestroyView();
     }
 }

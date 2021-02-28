@@ -1,11 +1,14 @@
 package com.personal.project.explora.db;
 
+import android.net.Uri;
+
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.personal.project.explora.utils.DateUtil;
-import com.personal.project.explora.utils.ObjectUtil;
+import com.personal.project.explora.utils.StringUtils;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -13,29 +16,35 @@ import java.util.Objects;
 @Entity(tableName = "episodes_table")
 public class Episode {
 
-    private static final String CREATION_DATE = "12.01.2021.";
-    public static final int NOT_DOWNLOADED = -1;
+    public static final int NOT_DOWNLOADED = 0;
+    public static final int DOWNLOADING = 1;
+    public static final int DOWNLOADED = 2;
+    private static final int COMPLETED_PERCENTAGE_THRESHOLD = 97;
 
     @PrimaryKey(autoGenerate = true)
     private int id;
     private int year;
     private String title;
     private String description;
-    private String length;
     private String link;
-    private String image;
-    private String lastUpdated;
-    private int downloadId;
 
-    public Episode(int year, String title, String description, String length, String link, String image, String lastUpdated) {
+    @ColumnInfo(name = "downloadId")
+    private int downloadState;
+    private String lastUpdated;
+    private long lastPosition;
+    private long duration;
+    private String recent;
+
+    public Episode(int year, String title, String description, String link, String lastUpdated, long duration) {
         this.year = year;
         this.title = title;
         this.description = description;
-        this.length = length;
         this.link = link;
-        this.image = image;
+        this.downloadState = NOT_DOWNLOADED;
         this.lastUpdated = lastUpdated;
-        this.downloadId = NOT_DOWNLOADED;
+        this.lastPosition = 0L;
+        this.duration = duration;
+        this.recent = null;
     }
 
     public Episode(Episode other) {
@@ -43,21 +52,25 @@ public class Episode {
         this.year = other.year;
         this.title = other.title;
         this.description = other.description;
-        this.length = other.length;
         this.link = other.link;
-        this.image = other.image;
+        this.downloadState = other.downloadState;
         this.lastUpdated = other.lastUpdated;
-        this.downloadId = other.downloadId;
+        this.lastPosition = other.lastPosition;
+        this.duration = other.duration;
+        this.recent = other.recent;
     }
 
+    /**
+     * Duration should never be not set, but the only time I use this method I call setDuration a
+     * bit later on (BAD CODE I KNOW, IM RUNNING OUT OF DEBUGGING TIME)
+     */
     public Episode(String link, String description, LocalDate date, LocalDate lastUpdated) {
         this(date.getYear(),
                 "Emisija " + DateUtil.formatMyDate(date),
                 description,
-                null,
                 link,
-                null,
-                DateUtil.formatMyDate(lastUpdated));
+                DateUtil.formatMyDate(lastUpdated),
+                0L);
     }
 
     public int getId() {
@@ -80,28 +93,64 @@ public class Episode {
         return description;
     }
 
-    public String getLength() {
-        return length;
-    }
-
     public String getLink() {
         return link;
     }
 
-    public String getImage() {
-        return image;
+    public static boolean isValidDownloadId(int downloadId) {
+        return downloadId == DOWNLOADED || downloadId == NOT_DOWNLOADED || downloadId == DOWNLOADING;
+    }
+
+    public Uri getUri() {
+        return Uri.parse(link);
+    }
+
+    public int getDownloadState() {
+        return downloadState;
     }
 
     public String getLastUpdated() {
         return lastUpdated;
     }
 
-    public int getDownloadId() {
-        return downloadId;
+    public void setDownloadState(int downloadState) {
+        this.downloadState = downloadState;
     }
 
-    public void setDownloadId(int download_id) {
-        this.downloadId = download_id;
+    public long getLastPosition() {
+        return lastPosition;
+    }
+
+    public void setLastPosition(long lastPosition) {
+        this.lastPosition = lastPosition;
+    }
+
+    public void markAsCompleted() {
+        this.lastPosition = duration;
+    }
+
+    public void resetProgress() {
+        this.lastPosition = 0L;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
+    public String getRecent() {
+        return recent;
+    }
+
+    public void setRecent(String recent) {
+        this.recent = recent;
+    }
+
+    public boolean isCompleted() {
+        return (100 * lastPosition/duration >= COMPLETED_PERCENTAGE_THRESHOLD);
     }
 
     /**
@@ -110,27 +159,19 @@ public class Episode {
      Episode which is being completed must have id and title (by extension also year).
      */
     public boolean completes(Episode other) {
-        if (other.isComplete())
+        if (other.areContentComplete())
             return false;
         
         if (!this.title.equals(other.title))
             return false;
         
         boolean ret = false;
-        if (ObjectUtil.isEmpty(other.description) &&
-                !ObjectUtil.isEmpty(this.description))
+        if (StringUtils.isEmpty(other.description) &&
+                !StringUtils.isEmpty(this.description))
             ret = true;
 
-        if (ObjectUtil.isEmpty(other.link) &&
-                !ObjectUtil.isEmpty(this.link))
-            ret = true;
-
-        if (ObjectUtil.isEmpty(other.length) &&
-                !ObjectUtil.isEmpty(this.length))
-            ret = true;
-
-        if (ObjectUtil.isEmpty(other.image) &&
-                !ObjectUtil.isEmpty(this.image))
+        if (StringUtils.isEmpty(other.link) &&
+                !StringUtils.isEmpty(this.link))
             ret = true;
         
         return ret;
@@ -139,20 +180,24 @@ public class Episode {
     /**
      Checks if episode has all non-empty fields.
      */
-    public boolean isComplete() {
+    public boolean areContentComplete() {
         boolean ret = true;
         if (id == 0) ret = false;
-        if (ObjectUtil.isEmpty(title)) ret = false;
-        if (ObjectUtil.isEmpty(description)) ret = false;
-        if (ObjectUtil.isEmpty(length)) ret = false;
-        if (ObjectUtil.isEmpty(link)) ret = false;
-        if (ObjectUtil.isEmpty(image)) ret = false;
-        if (ObjectUtil.isEmpty(lastUpdated)) ret = false;
+        if (StringUtils.isEmpty(title)) ret = false;
+        if (StringUtils.isEmpty(description)) ret = false;
+        if (StringUtils.isEmpty(link)) ret = false;
+        if (StringUtils.isEmpty(lastUpdated)) ret = false;
         
         return ret;
     }
 
-    public void completeWith(Episode other) {
+    /**
+     * used in when I'm updating the database with freshly-baked episodes from the RSS. these
+     * fresh pastry dudes will not have a downloadId or lastPosition or be recent so there is no
+     * need to update those, since if the episode already exists in my database it might have
+     * these values set to something meaningful that is not worth resetting
+     */
+    public void completeContentWith(Episode other) {
 
         if (!other.completes(this))
             return;
@@ -160,11 +205,10 @@ public class Episode {
         //this has id
         //this had year
         //this has title
-        if (!ObjectUtil.isEmpty(other.description)) this.description = other.description;
-        if (!ObjectUtil.isEmpty(other.length)) this.length = other.length;
-        if (!ObjectUtil.isEmpty(other.link)) this.link = other.link;
-        if (!ObjectUtil.isEmpty(other.image)) this.image = other.image;
-        if (!ObjectUtil.isEmpty(other.lastUpdated)) this.lastUpdated = other.lastUpdated;
+        if (!StringUtils.isEmpty(other.description)) this.description = other.description;
+        if (!StringUtils.isEmpty(other.link)) this.link = other.link;
+        if (!StringUtils.isEmpty(other.lastUpdated)) this.lastUpdated = other.lastUpdated;
+        //no lastposition
         //no downloadID
     }
 
@@ -175,30 +219,31 @@ public class Episode {
         Episode episode = (Episode) o;
         return id == episode.id &&
                 year == episode.year &&
-                downloadId == episode.downloadId &&
                 title.equals(episode.title) &&
                 Objects.equals(description, episode.description) &&
-                Objects.equals(length, episode.length) &&
                 Objects.equals(link, episode.link) &&
-                Objects.equals(image, episode.image) &&
-                Objects.equals(lastUpdated, episode.lastUpdated);
+                downloadState == episode.downloadState &&
+                Objects.equals(lastUpdated, episode.lastUpdated) &&
+                lastPosition == episode.lastPosition &&
+                duration == episode.duration &&
+                Objects.equals(recent, episode.recent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, year, title, description, length, link, image, lastUpdated, downloadId);
+        return Objects.hash(id, year, title, description, link, downloadState, lastUpdated, lastPosition, duration, recent);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "[ ID: " + id + "; " +
-                "Year: " + year + "; " +
                 "Title: " + title + "; " +
-                "Description: " + description + "; " +
-                "Length: " + length + "; " +
                 "Link: " + link + "; " +
-                "Image: " + image + "; " +
+                "DownloadId: " + downloadState + "; " +
                 "LastUpdated: " + lastUpdated + "; " +
-                "DownloadID: " + downloadId + " ]";
+                "LastPosition: " + lastPosition + "; " +
+                "Duration: " + duration + " ]";
     }
+
 }

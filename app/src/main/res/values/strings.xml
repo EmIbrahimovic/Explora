@@ -1,9 +1,17 @@
 <resources>
     <string name="app_name">Explora</string>
+
+    <!-- NotificationChannel name and description -->
+    <string name="notification_channel">Now Playing</string>
+    <string name="notification_channel_description">Shows what media is currently playing</string>
+
+    <!-- Top level fragment titles -->
     <string name="title_home">Home</string>
     <string name="title_listen">Listen</string>
     <string name="title_activity">Activity</string>
     <string name="title_question">Question</string>
+
+    <!-- HomeFragment strings -->
     <string name="home_description">
         Korado Korlević u Explori odgovora na brojna pitanja i zagonetke
         svijeta oko nas. Zanimljive i kontroverzne teme, znanstve novosti, povijesne zagonetke i
@@ -12,10 +20,23 @@
     </string>
     <string name="visnjan_observatory">Višnjan Observatory</string>
     <string name="croatian_radio">Croatian Radio</string>
+
+    <!-- QuestionFragment strings -->
     <string name="question_subject">Subject</string>
     <string name="send_question_email">Send Email</string>
     <string name="question_body">Question Body…</string>
+
+    <!-- EpisodeCard and EpisodeAdapter strings -->
     <string name="episode_title">Episode Title</string>
     <string name="episode_desctipion">Ovu godinu treba čim prije zaboraviti, slaviti ćemo odlazak stare a ne doček Nove. Rekapitulacija odlazeće godine, što se značajno dogodilo u znanosti, astronomiji, osvajanju Svemira i tehnologiji. Što nas očekuje u ovim oblastima u 2021. godini? NAPOMENA: emisija je snimljena 28.prosinca navečer.</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="playing">Playing…</string>
+    <string name="download">Download</string>
+    <string name="mark_as_completed">Mark as completed</string>
+    <string name="remove_download">Remove download</string>
+    <string name="mark_as_not_completed">Mark as not completed</string>
+    <string name="completed">Completed</string>
+
+    <!-- EpisodeList loading states -->
+    <string name="loading">Loading…</string>
+    <string name="empty">Empty…</string>
 </resources>
