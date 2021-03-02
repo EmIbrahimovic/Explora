@@ -1,19 +1,31 @@
 package com.personal.project.explora.ui.question;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class QuestionViewModel extends ViewModel {
 
-    private MutableLiveData<String> mText;
+    private CharSequence subjectText;
+    private CharSequence questionText;
 
     public QuestionViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is question fragment");
+        subjectText = null;
+        questionText = null;
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public CharSequence getSavedSubject() {
+        return (subjectText == null) ? "" : subjectText;
     }
+
+    public CharSequence getSavedQuestion() {
+        return (questionText == null) ? "" : questionText;
+    }
+
+    public void saveSubject(CharSequence subjectText) {
+        this.subjectText = subjectText;
+    }
+
+    public void saveQuestion(CharSequence questionText) {
+        this.questionText = questionText;
+    }
+
 }

@@ -239,11 +239,10 @@ public class Episode {
     public String toString() {
         return "[ ID: " + id + "; " +
                 "Title: " + title + "; " +
-                "Link: " + link + "; " +
                 "DownloadId: " + downloadState + "; " +
-                "LastUpdated: " + lastUpdated + "; " +
                 "LastPosition: " + lastPosition + "; " +
-                "Duration: " + duration + " ]";
+                "Duration: " + duration + "; " +
+                "Recent: " + recent + " ]";
     }
 
 }

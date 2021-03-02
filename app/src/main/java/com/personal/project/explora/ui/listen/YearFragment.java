@@ -16,8 +16,6 @@ import java.util.List;
 
 public class YearFragment extends EpisodeListFragment {
 
-    private static final String TAG = "YearFragment";
-
     private static final String ARG_YEAR = "ARGUMENT_YEAR";
 
     private int mYear;
@@ -54,14 +52,14 @@ public class YearFragment extends EpisodeListFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        mBinding.swipeRefreshEpisodeList.setOnRefreshListener(() -> {
-            mViewModel.doRefresh();
-            mBinding.swipeRefreshEpisodeList.setRefreshing(false);
-        });
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
 
-        return view;
+    @Override
+    public void onRefresh() {
+        mViewModel.doRefresh();
+        mBinding.swipeRefreshEpisodeList.setRefreshing(false);
     }
 
     @Override

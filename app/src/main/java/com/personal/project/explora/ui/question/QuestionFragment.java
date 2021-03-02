@@ -1,23 +1,20 @@
 package com.personal.project.explora.ui.question;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.opengl.ETC1;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.personal.project.explora.R;
 
@@ -25,56 +22,60 @@ import java.util.List;
 
 public class QuestionFragment extends Fragment {
 
-    private QuestionViewModel questionViewModel;
-    Button buttonMail;
-    EditText subject;
-    EditText question;
+    public static final String EXPLORA_EMAIL = "explora@hrt.hr";
 
-    /*
+    private QuestionViewModel mViewModel;
 
-    PUT ALL TEXT IN THE SAVED INSTANCE STATE
-
-     */
+    private EditText subject;
+    private EditText question;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        questionViewModel =
-                new ViewModelProvider(this).get(QuestionViewModel.class);
-                //ViewModelProviders.of(this).get(QuestionViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_question, container, false);
-        buttonMail = root.findViewById(R.id.button_mail);
+        Button buttonMail = root.findViewById(R.id.button_mail);
+
         subject = root.findViewById(R.id.edit_text_subject);
         question = root.findViewById(R.id.edit_text_body);
 
-        buttonMail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mailIntent = createEmailIntent(
-                        "emira.ibrahimovic@hotmail.com",
-                        subject.getText().toString(),
-                        question.getText().toString());
-
-                startActivity(mailIntent);
-            }
-        });
+        buttonMail.setOnClickListener(v -> sendMail());
 
         return root;
     }
 
-    public Intent createEmailIntent(final String toEmail,
-                                    final String subject,
-                                    final String message)
-    {
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mViewModel = new ViewModelProvider(requireActivity()).get(QuestionViewModel.class);
+
+        subject.setText(mViewModel.getSavedSubject());
+        question.setText(mViewModel.getSavedQuestion());
+    }
+
+    private void sendMail() {
+        Intent mailIntent = createEmailIntent(
+                subject.getText().toString(),
+                question.getText().toString());
+
+        subject.setText(null);
+        question.setText(null);
+        startActivity(mailIntent);
+    }
+
+    private Intent createEmailIntent(final String subject,
+                                     final String message) {
+
         Intent sendTo = new Intent(Intent.ACTION_SENDTO);
-        String uriText = "mailto:" + Uri.encode(toEmail) +
+        String uriText = "mailto:" + Uri.encode(QuestionFragment.EXPLORA_EMAIL) +
                 "?subject=" + Uri.encode(subject) +
                 "&body=" + Uri.encode(message);
         Uri uri = Uri.parse(uriText);
         sendTo.setData(uri);
 
+        @SuppressLint("QueryPermissionsNeeded")
         List<ResolveInfo> resolveInfos =
-                getActivity().getPackageManager().queryIntentActivities(sendTo, 0);
+                requireActivity().getPackageManager().queryIntentActivities(sendTo, 0);
 
         // Emulators may not like this check...
         if (!resolveInfos.isEmpty()) {
@@ -86,11 +87,18 @@ public class QuestionFragment extends Fragment {
 
         send.setType("text/plain");
         send.putExtra(Intent.EXTRA_EMAIL,
-                new String[] { toEmail });
+                new String[] {QuestionFragment.EXPLORA_EMAIL});
         send.putExtra(Intent.EXTRA_SUBJECT, subject);
         send.putExtra(Intent.EXTRA_TEXT, message);
 
         return Intent.createChooser(send, "Choose preferred email app: ");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mViewModel.saveSubject(subject.getText());
+        mViewModel.saveQuestion(question.getText());
     }
 
 }

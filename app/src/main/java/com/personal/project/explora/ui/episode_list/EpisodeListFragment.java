@@ -2,7 +2,6 @@ package com.personal.project.explora.ui.episode_list;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.personal.project.explora.R;
 import com.personal.project.explora.databinding.FragmentEpisodeListBinding;
@@ -27,9 +27,8 @@ import java.util.List;
 
 import static android.content.Intent.ACTION_SEND;
 
-public abstract class EpisodeListFragment extends Fragment implements EpisodeAdapter.EpisodeClickedListener {
-
-    private static final String TAG = "EpisodeListFragment";
+public abstract class EpisodeListFragment extends Fragment implements EpisodeAdapter.EpisodeClickedListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
     protected EpisodeListViewModel mViewModel;
     protected FragmentEpisodeListBinding mBinding;
@@ -51,6 +50,8 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        mBinding.swipeRefreshEpisodeList.setOnRefreshListener(this);
+
         mBinding.setIsLoading(true);
 
         return mBinding.getRoot();
@@ -60,8 +61,8 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel = new ViewModelProvider(getActivity()).get(EpisodeListViewModel.class);
-        mMainActivityViewModel = new ViewModelProvider(getActivity()).get(MainActivityViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(EpisodeListViewModel.class);
+        mMainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
         mEpisodes = getEpisodes();
 
         mAdapter = new EpisodeAdapter(this);
@@ -82,7 +83,6 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
 
             if (episodes != null) {
 
-                Log.d(TAG, "subscribeUiToEpisodeList: Received new list");
                 mBinding.setIsLoading(false);
 
                 if (episodes.isEmpty()) {
@@ -162,10 +162,6 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
 
     @Override
     public void onPlayEpisodeClicked(Episode episode) {
-// TODO uncomment if needed
-//        if (episode.isCompleted()) {
-//            mViewModel.markAsNotCompleted(episode);
-//        }
 
         boolean newRecent = mMainActivityViewModel.playableEpisodeClicked(episode);
         if (newRecent) {
@@ -199,8 +195,7 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
 
     private Intent makeShareIntent(Episode episode) {
         Intent sendIntent = new Intent(ACTION_SEND);
-        // TODO make full edit to db and add this link to HRT website
-        String text = "Listen to this episode of Explora! " + episode.getLink();
+        String text = "Poslušajte emisiju Explore: " + episode.getTitle() + " " + episode.getLink();
 
         sendIntent.putExtra(Intent.EXTRA_TEXT, text);
         sendIntent.setType("text/plain");

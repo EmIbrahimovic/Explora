@@ -8,8 +8,6 @@
         android:layout_height="match_parent"
         tools:context=".ui.listen.ListenFragment">
 
-        <!-- MAYBE INCREASE MINIMUM TAB SIZE, FOR SURE INCREASE TEXT SIZE, AT LEAST 4 MY PHONE -->
-
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/year_tabs"
             android:layout_width="match_parent"

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Explora</string>
+    <string name="app_name" translatable="false">Explora</string>
 
     <!-- NotificationChannel name and description -->
     <string name="notification_channel">Now Playing</string>
@@ -10,16 +10,23 @@
     <string name="title_listen">Listen</string>
     <string name="title_activity">Activity</string>
     <string name="title_question">Question</string>
+    <string name="title_links">Links</string>
 
     <!-- HomeFragment strings -->
-    <string name="home_description">
-        Korado Korlević u Explori odgovora na brojna pitanja i zagonetke
-        svijeta oko nas. Zanimljive i kontroverzne teme, znanstve novosti, povijesne zagonetke i
-        trendovi razvoja tehnologije. U emisiju se svojim pitanjima mogu uključiti i slušatelji. \n
-        Urednik i voditelj Elvis Mileta.
-    </string>
+    <string name="home_description"><a href="https://en.wikipedia.org/wiki/Korado_Korlevi%C4%87">Korado Korlević</a> u Explori odgovora na brojna pitanja i zagonetke svijeta oko nas. Zanimljive i kontroverzne teme, znanstve novosti, povijesne zagonetke i trendovi razvoja tehnologije. U emisiju se svojim pitanjima mogu uključiti i slušatelji. \nUrednik i voditelj Elvis Mileta.</string>
     <string name="visnjan_observatory">Višnjan Observatory</string>
-    <string name="croatian_radio">Croatian Radio</string>
+    <string name="croatian_radio">Croatian Radio: Radio Pula</string>
+    <string name="explorers_club">Explorers\' Club Explora</string>
+    <string name="version_code">Version code</string>
+    <string name="other_talks">Other talks by Korado Korlević</string>
+    <string name="release_notes" translatable="false">Release notes</string>
+
+    <!-- HomeFragment image descriptions -->
+    <string name="visnjan_button_desc">Link to Visnjan observatory website</string>
+    <string name="visnjan_fb_button_desc">Link to Visnjan observatory Facebook page</string>
+    <string name="radio_pula_button_desc">Link to Radio Pula website</string>
+    <string name="explora_button_desc">Link to Explorers\' Club Explora webpage</string>
+    <string name="korado_talks_button_desc">Link to other talks by Korado</string>
 
     <!-- QuestionFragment strings -->
     <string name="question_subject">Subject</string>
@@ -28,7 +35,7 @@
 
     <!-- EpisodeCard and EpisodeAdapter strings -->
     <string name="episode_title">Episode Title</string>
-    <string name="episode_desctipion">Ovu godinu treba čim prije zaboraviti, slaviti ćemo odlazak stare a ne doček Nove. Rekapitulacija odlazeće godine, što se značajno dogodilo u znanosti, astronomiji, osvajanju Svemira i tehnologiji. Što nas očekuje u ovim oblastima u 2021. godini? NAPOMENA: emisija je snimljena 28.prosinca navečer.</string>
+    <string name="episode_desctipion" translatable="false">Ovu godinu treba čim prije zaboraviti, slaviti ćemo odlazak stare a ne doček Nove. Rekapitulacija odlazeće godine, što se značajno dogodilo u znanosti, astronomiji, osvajanju Svemira i tehnologiji. Što nas očekuje u ovim oblastima u 2021. godini? NAPOMENA: emisija je snimljena 28.prosinca navečer.</string>
     <string name="playing">Playing…</string>
     <string name="download">Download</string>
     <string name="mark_as_completed">Mark as completed</string>
@@ -36,7 +43,20 @@
     <string name="mark_as_not_completed">Mark as not completed</string>
     <string name="completed">Completed</string>
 
+    <!-- EpisodeFragment image descriptions -->
+    <string name="options_button">Options button</string>
+    <string name="album_art">Album art</string>
+    <string name="play_pause_button">Play/pause button</string>
+    <string name="share_button">Share button</string>
+
     <!-- EpisodeList loading states -->
     <string name="loading">Loading…</string>
     <string name="empty">Empty…</string>
+    <string name="author">Author: <a href="https://github.com/EmIbrahimovic">Emira Ibrahimović</a></string>
+    <string name="an_error_occurred">An error occurred</string>
+
+    <!-- PlayerFragment image descriptions -->
+    <string name="rewind_button">Rewind button</string>
+    <string name="fast_forward_button">Fast forward button</string>
+
 </resources>

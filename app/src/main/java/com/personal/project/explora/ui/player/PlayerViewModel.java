@@ -1,14 +1,11 @@
 package com.personal.project.explora.ui.player;
 
 import android.app.Application;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -26,17 +23,26 @@ import static com.personal.project.explora.service.PlayerServiceConnection.NOTHI
 
 public class PlayerViewModel extends AndroidViewModel {
 
-    private static final String TAG = "PlayerViewModel";
     private static final long POSITION_UPDATE_INTERVAL_MILLIS = 100L;
-    private PlayerServiceConnection playerServiceConnection;
+
+    public static final int RES_PLAY_ARROW = R.drawable.exo_controls_play;
+    public static final int RES_PAUSE_LINES = R.drawable.exo_controls_pause;
+    public static final int RES_REPLAY = R.drawable.ic_replay_32;
+
+    private final Handler handler;
+
+    private final PlayerServiceConnection playerServiceConnection;
     private PlaybackStateCompat playbackState;
-    private MutableLiveData<NowPlayingMetadata> mediaMetadata;
-    private MutableLiveData<Long> mediaPosition;
-    private MutableLiveData<Integer> mediaButtonResource;
+
+    private final MutableLiveData<NowPlayingMetadata> mediaMetadata;
+    private final MutableLiveData<Long> mediaPosition;
+    private final MutableLiveData<Integer> mediaButtonResource;
+
     private boolean updatePosition;
-    private Handler handler;
-    private Observer<PlaybackStateCompat> playbackStateObserver;
-    private Observer<MediaMetadataCompat> mediaMetadataObserver;
+
+    private final Observer<PlaybackStateCompat> playbackStateObserver;
+    private final Observer<MediaMetadataCompat> mediaMetadataObserver;
+
     public PlayerViewModel(@NonNull Application application) {
         super(application);
 
@@ -63,9 +69,7 @@ public class PlayerViewModel extends AndroidViewModel {
         };
         playerServiceConnection.getPlaybackState().observeForever(playbackStateObserver);
 
-        mediaMetadataObserver = mediaMetadataCompat -> {
-            updateState(playbackState, mediaMetadataCompat);
-        };
+        mediaMetadataObserver = mediaMetadataCompat -> updateState(playbackState, mediaMetadataCompat);
         playerServiceConnection.getNowPlaying().observeForever(mediaMetadataObserver);
 
         checkPlaybackPosition();
@@ -83,8 +87,8 @@ public class PlayerViewModel extends AndroidViewModel {
         return mediaButtonResource;
     }
 
-    private Boolean checkPlaybackPosition() {
-        return handler.postDelayed(() -> {
+    private void checkPlaybackPosition() {
+        handler.postDelayed(() -> {
             long currentPosition;
             if (playbackState.getState() == PlaybackStateCompat.STATE_PLAYING) {
                 long timeDelta =
@@ -123,7 +127,11 @@ public class PlayerViewModel extends AndroidViewModel {
         mediaButtonResource.postValue(
                 (playbackState.getState() == PlaybackStateCompat.STATE_BUFFERING ||
                         playbackState.getState() == PlaybackStateCompat.STATE_PLAYING) ?
-                        R.drawable.exo_controls_pause : R.drawable.exo_controls_play);
+                        RES_PAUSE_LINES : RES_PLAY_ARROW);
+        if (getMediaMetadata().getValue() != null && getMediaPosition().getValue() != null &&
+                getMediaPosition().getValue() + 1500 >= getMediaMetadata().getValue().durationMs) {
+            mediaButtonResource.postValue(RES_REPLAY);
+        }
     }
 
     @Override

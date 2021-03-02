@@ -44,6 +44,8 @@ import static com.personal.project.explora.service.download.DemoUtil.DOWNLOAD_NO
 /** A service for downloading media. */
 public class DemoDownloadService extends DownloadService {
 
+  private static final String TAG = "DemoDownloadService";
+
   private static final int JOB_ID = 1;
   private static final int FOREGROUND_NOTIFICATION_ID = 1;
 
@@ -123,7 +125,7 @@ public class DemoDownloadService extends DownloadService {
           repo.getFromIdAndUpdateDownloadId(id, Episode.NOT_DOWNLOADED);
       }
       else {
-        Log.w("DemoDownloadService", "onDownloadRemoved: mystery downloadId " + downloadId);
+        Log.w(TAG, "onDownloadRemoved: null downloadId");
       }
 
     }
@@ -137,7 +139,7 @@ public class DemoDownloadService extends DownloadService {
         repo.getFromIdAndUpdateDownloadId(id, Episode.NOT_DOWNLOADED);
       }
       else {
-        Log.w("DemoDownloadService", "onDownloadRemoved: mystery downloadId " + downloadId);
+        Log.w(TAG, "onDownloadRemoved: null downloadId");
       }
     }
 

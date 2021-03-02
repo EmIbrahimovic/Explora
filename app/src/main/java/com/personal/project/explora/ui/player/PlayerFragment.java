@@ -1,7 +1,6 @@
 package com.personal.project.explora.ui.player;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +19,6 @@ import com.personal.project.explora.utils.StringUtils;
 import com.squareup.picasso.Picasso;
 
 public class PlayerFragment extends Fragment {
-
-    private static final String TAG = "PlayerFragment";
 
     private static final int REWIND_VAL = 15000;
     private static final int FAST_FORWARD_VAL = 15000;
@@ -50,8 +47,9 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         mPlayerViewModel = new ViewModelProvider(this).get(PlayerViewModel.class);
-        mMainActivityViewModel = new ViewModelProvider(getActivity()).get(MainActivityViewModel.class);
+        mMainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
 
         mBinding.mediaButton.setOnClickListener(v -> {
             if (mPlayerViewModel.getMediaMetadata().getValue() != null)
@@ -73,32 +71,28 @@ public class PlayerFragment extends Fragment {
             }
         });
 
-        mPlayerViewModel.getMediaMetadata().observe(getViewLifecycleOwner(),
-                this::updateUI);
-        mPlayerViewModel.getMediaButtonResource().observe(getViewLifecycleOwner(),
-                res -> mBinding.mediaButton.setImageResource(res));
-        mPlayerViewModel.getMediaPosition().observe(getViewLifecycleOwner(), pos -> {
-            mBinding.position.setText(StringUtils.timestampToMSS(pos));
-            mBinding.seekBar.setProgress(Math.toIntExact(pos));
-        });
-
         mBinding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser)
-                    mMainActivityViewModel.seekTo(progress);
+//                if (fromUser)
+//                    mMainActivityViewModel.seekTo(progress);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                if (mPlayerViewModel.getMediaMetadata().getValue() != null)
-                    mMainActivityViewModel.playMediaId(mPlayerViewModel.getMediaMetadata().getValue().id);
+                if (mPlayerViewModel.getMediaMetadata().getValue() != null) {
+                    if (mPlayerViewModel.getMediaButtonResource().getValue() != null &&
+                            mPlayerViewModel.getMediaButtonResource().getValue() == PlayerViewModel.RES_PAUSE_LINES)
+                        mMainActivityViewModel.playMediaId(mPlayerViewModel.getMediaMetadata().getValue().id);
+                }
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (mPlayerViewModel.getMediaMetadata().getValue() != null)
+                if (mPlayerViewModel.getMediaMetadata().getValue() != null) {
+                    mMainActivityViewModel.seekTo(seekBar.getProgress());
                     mMainActivityViewModel.playMediaId(mPlayerViewModel.getMediaMetadata().getValue().id);
+                }
             }
         });
 
@@ -106,8 +100,27 @@ public class PlayerFragment extends Fragment {
         mBinding.playerFragmentToolbar.setNavigationOnClickListener(
                 v -> mMainActivityViewModel.onBackPressed());
 
+        mBinding.playerFragmentToolbar.setTitle(R.string.loading);
         mBinding.duration.setText(StringUtils.timestampToMSS(0L));
         mBinding.position.setText(StringUtils.timestampToMSS(0L));
+
+
+        mPlayerViewModel.getMediaMetadata().observe(getViewLifecycleOwner(),
+                this::updateUI);
+        mPlayerViewModel.getMediaButtonResource().observe(getViewLifecycleOwner(), res -> {
+            mBinding.mediaButton.setImageResource(res);
+            if (res == PlayerViewModel.RES_REPLAY) {
+                mBinding.fastForwardButton.setVisibility(View.INVISIBLE);
+                mBinding.rewindButton.setVisibility(View.INVISIBLE);
+            } else {
+                mBinding.fastForwardButton.setVisibility(View.VISIBLE);
+                mBinding.rewindButton.setVisibility(View.VISIBLE);
+            }
+        });
+        mPlayerViewModel.getMediaPosition().observe(getViewLifecycleOwner(), pos -> {
+            mBinding.position.setText(StringUtils.timestampToMSS(pos));
+            mBinding.seekBar.setProgress(Math.toIntExact(pos));
+        });
     }
 
     private void updateUI(PlayerViewModel.NowPlayingMetadata metadata) {
@@ -118,7 +131,6 @@ public class PlayerFragment extends Fragment {
                 .centerInside()
                 .into(mBinding.albumArt);
 
-        mBinding.title.setText(metadata.title);
         mBinding.playerFragmentToolbar.setTitle(metadata.title);
         mBinding.duration.setText(metadata.duration);
         mBinding.seekBar.setMax((int) metadata.durationMs);

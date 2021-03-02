@@ -20,7 +20,9 @@ public class YearsData {
     private static Map<Integer, Integer> yearRes = null;
 
     public static int getYearImageRes(int year) {
+
         if (yearRes == null) {
+
             yearRes = new HashMap<>();
             for (int i = 0; i < YEARS.length; i++) {
                 yearRes.put(YEARS[i], YEAR_IMAGE_RES[i]);

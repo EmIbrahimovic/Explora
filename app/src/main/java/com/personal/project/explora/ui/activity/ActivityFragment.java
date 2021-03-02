@@ -9,8 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayout;
@@ -22,12 +20,8 @@ public class ActivityFragment extends Fragment {
 
     private FragmentActivityBinding mBinding;
 
-    private ActivityViewModel mViewModel;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mViewModel =
-                new ViewModelProvider(this).get(ActivityViewModel.class);
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_activity, container, false);
 
         return mBinding.getRoot();

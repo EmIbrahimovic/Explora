@@ -28,4 +28,9 @@ public class RecentFragment extends EpisodeListFragment {
                 DateUtil.compareStringDateTimes(o1.getRecent(), o2.getRecent()));
 
     }
+
+    @Override
+    public void onRefresh() {
+        mBinding.swipeRefreshEpisodeList.setRefreshing(false);
+    }
 }

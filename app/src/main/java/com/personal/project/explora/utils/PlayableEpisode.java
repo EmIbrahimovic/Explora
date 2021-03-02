@@ -1,13 +1,14 @@
 package com.personal.project.explora.utils;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.personal.project.explora.R;
 import com.personal.project.explora.db.Episode;
+
+import java.util.Objects;
 
 public class PlayableEpisode extends Episode {
 
@@ -27,17 +28,16 @@ public class PlayableEpisode extends Episode {
                 @Override
                 public boolean areContentsTheSame(@NonNull PlayableEpisode oldItem, @NonNull PlayableEpisode newItem) {
                     return (oldItem.getId() == newItem.getId() &&
-                            oldItem.getDescription().equals(newItem.getDescription()) &&
+                            Objects.equals(oldItem.getDescription(), newItem.getDescription()) &&
                             oldItem.getLastPosition() == newItem.getLastPosition() &&
                             oldItem.getDownloadState() == newItem.getDownloadState() &&
                             oldItem.playbackRes == newItem.playbackRes);
                 }
 
-                //@Nullable
                 @Override
                 public Object getChangePayload(@NonNull PlayableEpisode oldItem, @NonNull PlayableEpisode newItem) {
                     Bundle payload = new Bundle();
-                    if (!oldItem.getDescription().equals(newItem.getDescription())) {
+                    if (!Objects.equals(oldItem.getDescription(), newItem.getDescription())) {
                         payload.putInt(DESCRIPTION_CHANGED, 1);
                     }
                     if (oldItem.playbackRes != newItem.playbackRes) {

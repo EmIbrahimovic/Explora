@@ -8,7 +8,6 @@ import org.simpleframework.xml.Root;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Root(name = "item", strict =  false)
 public class Item implements Serializable {

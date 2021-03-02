@@ -1,7 +1,6 @@
 package com.personal.project.explora.service.download;
 
 import android.app.Application;
-import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -18,13 +17,13 @@ import com.personal.project.explora.EpisodeRepository;
 import com.personal.project.explora.db.Episode;
 
 import java.io.IOException;
-import java.util.concurrent.Executor;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DownloadUtil {
 
     private static final String TAG = "DownloadUtil";
 
-    // TODO finish this one for real
     public static void setRealDownloadsState(Application app) {
         AppExecutors appExecutors = ((BasicApp) app).getAppExecutors();
         DownloadManager downloadManager = DemoUtil.getDownloadManager(
@@ -33,31 +32,34 @@ public class DownloadUtil {
                 appExecutors.diskIO());
 
         DownloadIndex downloadIndex = downloadManager.getDownloadIndex();
-        try {
-            EpisodeRepository repo = ((BasicApp) app).getRepository();
-            DownloadCursor cursor = downloadIndex.getDownloads(Download.STATE_COMPLETED);
-            do {
-                Download download = cursor.getDownload();
-                String downloadId = download.request.id;
-                if (downloadId != null) {
-                    int id = Integer.parseInt(downloadId);
-                    repo.getFromIdAndUpdateDownloadId(id, Episode.DOWNLOADED);
-                }
-                else {
-                    Log.w(TAG, "onDownloadRemoved: mystery downloadId " + downloadId);
+        appExecutors.diskIO().execute(() -> {
+            try {
+                DownloadCursor cursor = downloadIndex.getDownloads(Download.STATE_COMPLETED);
+                List<Integer> downloadedIds = new ArrayList<>();
+                while (cursor.moveToNext()) {
+                    Download download = cursor.getDownload();
+                    String downloadId = download.request.id;
+                    if (downloadId != null) {
+                        int id = Integer.parseInt(downloadId);
+                        downloadedIds.add(id);
+                    }
+                    else {
+                        Log.w(TAG, "onDownloadRemoved: null downloadId");
+                    }
+
+                    EpisodeRepository repo = ((BasicApp) app).getRepository();
+                    repo.updateDownloads(downloadedIds);
+
                 }
 
-            } while (cursor.moveToNext());
-
-        } catch (IOException e) {
-            Log.e(TAG, "getDownloads threw IOException", e);
-        }
+            } catch (IOException e) {
+                Log.e(TAG, "getDownloads threw IOException", e);
+            }
+        });
     }
 
     /**
      * This guy automatically updates episode state in the db
-     * @param episode
-     * @param context
      */
     public static void addDownload(Episode episode, Context context) {
 
@@ -77,8 +79,6 @@ public class DownloadUtil {
 
     /**
      * This guy automatically updates episode state in the db
-     * @param episode
-     * @param context
      */
     public static void removeDownload(Episode episode, Context context) {
 
@@ -92,13 +92,13 @@ public class DownloadUtil {
         );
     }
 
-    public static void removeAllDownloads(Context context) {
+    /*public static void removeAllDownloads(Context context) {
 
         DownloadService.sendRemoveAllDownloads(
                 context,
                 DemoDownloadService.class,
                 false
         );
-    }
+    }*/
 
 }

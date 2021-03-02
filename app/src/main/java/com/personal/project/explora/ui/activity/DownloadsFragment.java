@@ -17,4 +17,9 @@ public class DownloadsFragment extends EpisodeListFragment {
     protected LiveData<List<Episode>> getEpisodes() {
         return super.mViewModel.getDownloadedEpisodes();
     }
+
+    @Override
+    public void onRefresh() {
+        mBinding.swipeRefreshEpisodeList.setRefreshing(false);
+    }
 }

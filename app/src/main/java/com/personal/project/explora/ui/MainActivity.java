@@ -2,7 +2,6 @@ package com.personal.project.explora.ui;
 
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,19 +10,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.personal.project.explora.BasicApp;
 import com.personal.project.explora.R;
 import com.personal.project.explora.databinding.ActivityMainBinding;
-import com.personal.project.explora.ui.player.PlayerFragment;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String TAG = "MainActivity";
 
     Fragment playerFragmentCurrent;
     ActivityMainBinding mBinding;
@@ -34,20 +28,14 @@ public class MainActivity extends AppCompatActivity {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         BottomNavigationView navView = mBinding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_listen,
-                R.id.navigation_activity, R.id.navigation_question)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        assert navHostFragment != null;
+        NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(navView, navController);
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         MainActivityViewModel mViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-        //((BasicApp)getApplication()).getPlayerServiceConnection().onActivityCreated();
 
         mViewModel.getNavigateToFragment().observe(this, it -> {
             if (it == null) return;
@@ -84,12 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 else mBinding.navView.setVisibility(View.GONE);
             }
         });
+
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        //((BasicApp)getApplication()).getPlayerServiceConnection().onActivityStarted();
-    }
 }

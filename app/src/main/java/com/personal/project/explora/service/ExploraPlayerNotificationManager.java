@@ -2,9 +2,7 @@ package com.personal.project.explora.service;
 
 import android.app.Application;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.media.MediaMetadata;
 import android.net.Uri;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -16,7 +14,6 @@ import androidx.annotation.Nullable;
 import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.PlayerNotificationManager;
-import com.google.android.exoplayer2.util.NonNullApi;
 import com.personal.project.explora.AppExecutors;
 import com.personal.project.explora.BasicApp;
 import com.personal.project.explora.R;
@@ -24,29 +21,19 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class ExploraPlayerNotificationManager {
 
-    public static final String NOW_PLAYING_CHANNEL_ID = "com.example.musicplayerexample_firsttry.NOW_PLAYING";
+    public static final String NOW_PLAYING_CHANNEL_ID = "com.personal.project.explora.service.NOW_PLAYING";
     public static final int NOW_PLAYING_NOTIFICATION_ID = 0xb339;
     private static final int NOTIFICATION_LARGE_ICON_SIZE = 144; // px
 
-    private AppExecutors mExecutors;
+    private final AppExecutors mExecutors;
 
-    private Context context;
-    private MediaSessionCompat.Token sessionToken;
-    private PlayerNotificationManager.NotificationListener notificationListener;
-
-    private Player player = null;
-    private PlayerNotificationManager notificationManager;
+    private final PlayerNotificationManager notificationManager;
 
     public ExploraPlayerNotificationManager(Application context, MediaSessionCompat.Token sessionToken,
                                             PlayerNotificationManager.NotificationListener notificationListener) {
-        this.context = context;
-        this.sessionToken = sessionToken;
-        this.notificationListener = notificationListener;
 
         MediaControllerCompat mediaController = new MediaControllerCompat(context, sessionToken);
 
@@ -60,7 +47,7 @@ public class ExploraPlayerNotificationManager {
                 NOW_PLAYING_NOTIFICATION_ID,
                 new DescriptionAdapter(mediaController, context),
                 notificationListener);
-        notificationManager.setSmallIcon(R.drawable.exo_styled_controls_vr);
+        notificationManager.setSmallIcon(R.drawable.ic_play_circle_filled_24);
         notificationManager.setMediaSessionToken(sessionToken);
         notificationManager.setUseStopAction(true);
         notificationManager.setUseChronometer(true);
@@ -81,8 +68,8 @@ public class ExploraPlayerNotificationManager {
 
         Integer currentIconRes = null;
         Bitmap currentBitmap = null;
-        private MediaControllerCompat controller;
-        private PlayerServiceConnection connection;
+        private final MediaControllerCompat controller;
+        private final PlayerServiceConnection connection;
 
         public DescriptionAdapter(MediaControllerCompat controller, Application app) {
             this.controller = controller;
@@ -91,6 +78,12 @@ public class ExploraPlayerNotificationManager {
 
         @Override
         public CharSequence getCurrentContentTitle(Player player) {
+            // My addition! and probably bad practice! The thing is that controller.getMetadata()
+            // didn't work for me since the metadata gets updated twice when I start the service:
+            // the first time by me and the second time by God knows what. I fixed this in the
+            // connection by adding a check that the metadata is not null when updating nowPlaying,
+            // and the only way I saw to fix the issue in the notification manager was to take the
+            // data from the connection instead of the controller
             MediaMetadataCompat metadata = connection.getNowPlaying().getValue();
             if (metadata == null) {
                 metadata = controller.getMetadata();

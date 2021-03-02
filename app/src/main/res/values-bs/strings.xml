@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel">Trenutno slušam</string>
+    <string name="notification_channel_description">Prikazuje koja emisija je trenutno emitirana</string>
+    <string name="title_listen">Slušaj</string>
+    <string name="title_activity">Aktivnost</string>
+    <string name="title_question">Pitanje</string>
+    <string name="visnjan_observatory">Zvjezdarnica Višnjan</string>
+    <string name="croatian_radio">Hrvatski radio: Radio Pula</string>
+    <string name="explorers_club">Klub istraživača Explora</string>
+    <string name="question_subject">Predmet</string>
+    <string name="send_question_email">Pošalji e-mail</string>
+    <string name="episode_title">Naslov emisije</string>
+    <string name="download">Preuzmi</string>
+    <string name="mark_as_completed">Označi kao \"preslušano\"</string>
+    <string name="mark_as_not_completed">Označi kao \"nepreslušano\"</string>
+    <string name="remove_download">Ukloni preuzetu datoteku</string>
+    <string name="completed">Preslušano</string>
+    <string name="loading">Učitavanje…</string>
+    <string name="empty">Prazno…</string>
+    <string name="playing">Pušta se…</string>
+    <string name="question_body">Sadržaj pitanja…</string>
+    <string name="title_home">Naslovnica</string>
+    <string name="title_links">Linkovi</string>
+    <string name="version_code">Broj verzije</string>
+    <string name="home_description"><a href="https://hr.wikipedia.org/wiki/Korado_Korlevi%C4%87">Korado Korlević</a> u Explori odgovora na brojna pitanja i zagonetke svijeta oko nas. Zanimljive i kontroverzne teme, znanstve novosti, povijesne zagonetke i trendovi razvoja tehnologije. U emisiju se svojim pitanjima mogu uključiti i slušatelji. \nUrednik i voditelj Elvis Mileta.</string>
+    <string name="other_talks">Predavanja Korada Korlevića</string>
+    <string name="author">Autor: <a href="https://github.com/EmIbrahimovic">Emira Ibrahimović</a></string>
+    <string name="an_error_occurred">Došlo je do greške</string>
+    <string name="visnjan_button_desc">Link na web stranicu Zvjezdarnice Višnjan</string>
+    <string name="visnjan_fb_button_desc">Link na Facebook stranicu Zvjezdarnice Višnjan</string>
+    <string name="radio_pula_button_desc">Link na web stranicu Radio Pule</string>
+    <string name="explora_button_desc">Link na web stranicu Kluba istraživača Explora</string>
+    <string name="korado_talks_button_desc">Link na Koradova predavanja</string>
+    <string name="options_button">Dugme za opcije</string>
+    <string name="album_art">Slika</string>
+    <string name="play_pause_button">Stani/pusti dugme</string>
+    <string name="share_button">Dugme za dijeljenje</string>
+    <string name="rewind_button">Dugme za premotavanje unazad</string>
+    <string name="fast_forward_button">Dugme za premotavanje unaprijed</string>
+</resources>

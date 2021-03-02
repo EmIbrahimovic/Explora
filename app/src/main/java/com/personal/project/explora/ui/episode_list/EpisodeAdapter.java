@@ -1,5 +1,6 @@
 package com.personal.project.explora.ui.episode_list;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +29,7 @@ import java.util.List;
 
 public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.EpisodeHolder> {
 
-    private EpisodeClickedListener episodeClickedListener;
+    private final EpisodeClickedListener episodeClickedListener;
 
     protected EpisodeAdapter(EpisodeClickedListener episodeClickedListener) {
         super(PlayableEpisode.diffCallback);
@@ -47,7 +49,7 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
     public void onBindViewHolder(@NonNull EpisodeHolder holder, int position, @NonNull List<Object> payloads) {
 
         PlayableEpisode currentEpisode = getItem(position);
-        boolean fullRefresh = StringUtils.isEmpty(payloads);
+        boolean fullRefresh = payloads.isEmpty();
 
         if (!fullRefresh) {
             for (int i = 0; i < payloads.size(); i++) {
@@ -57,9 +59,11 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
                     holder.textViewDescription.setText(currentEpisode.getDescription());
 
                 if (payload.getInt(PlayableEpisode.LAST_POSITION_CHANGED, -1) != -1 ||
-                        payload.getInt(PlayableEpisode.PLAYBACK_RES_CHANGED, -1) != -1)
+                        payload.getInt(PlayableEpisode.PLAYBACK_RES_CHANGED, -1) != -1) {
                     holder.setLastPositionText(currentEpisode.getPlaybackRes(),
                             currentEpisode.isCompleted(), currentEpisode.getLastPosition());
+                    holder.setBackgroundColor(currentEpisode.isCompleted());
+                }
 
                 if (payload.getInt(PlayableEpisode.PLAYBACK_RES_CHANGED, -1) != -1)
                     holder.buttonPlay.setImageResource(currentEpisode.getPlaybackRes());
@@ -76,13 +80,14 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
     public void onBindViewHolder(@NonNull EpisodeHolder holder, int position) {
         PlayableEpisode currentEpisode = getItem(position);
 
+        holder.setBackgroundColor(currentEpisode.isCompleted());
+
         holder.textViewTitle.setText(currentEpisode.getTitle());
 
-        holder.textViewDescription.setText(currentEpisode.getDescription());
+        holder.setDescription(currentEpisode.getDescription());
 
         Picasso.get()
                 .load(YearsData.getYearImageRes(currentEpisode.getYear()))
-                .placeholder(R.drawable.ic_launcher_foreground)
                 .into(holder.image);
 
         holder.buttonPlay.setOnClickListener(v ->
@@ -130,6 +135,7 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
 
     static class EpisodeHolder extends RecyclerView.ViewHolder {
 
+        private final CardView container;
         private final TextView textViewTitle;
         private final TextView textViewDescription;
         private final TextView textViewLastPosition;
@@ -141,6 +147,7 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
         public EpisodeHolder(@NonNull View itemView) {
             super(itemView);
 
+            container = itemView.findViewById(R.id.episode_card_container);
             textViewTitle = itemView.findViewById(R.id.episode_title);
             textViewDescription = itemView.findViewById(R.id.episode_description);
             textViewLastPosition = itemView.findViewById(R.id.episode_last_position);
@@ -158,6 +165,20 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
             else if (playbackRes == PlayableEpisode.RES_PLAY)
                 textViewLastPosition.setText(StringUtils.timestampToMSS(lastPosition));
         }
+
+        public void setBackgroundColor(boolean isCompleted) {
+            container.setCardBackgroundColor(isCompleted
+                    ? container.getContext().getResources().getColor(R.color.completed_card_background)
+                    : container.getContext().getResources().getColor(R.color.not_completed_card_background));
+        }
+
+        public void setDescription(String description) {
+            textViewDescription.setText(description);
+            if (description == null || description.equals("null"))
+                textViewDescription.setVisibility(View.GONE);
+            else
+                textViewDescription.setVisibility(View.VISIBLE);
+        }
     }
 
     class MenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
@@ -167,6 +188,7 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
             this.position = position;
         }
 
+        @SuppressLint("NonConstantResourceId")
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {

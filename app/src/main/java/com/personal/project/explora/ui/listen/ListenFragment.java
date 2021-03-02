@@ -38,7 +38,7 @@ public class ListenFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel = new ViewModelProvider(getActivity()).get(EpisodeListViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(EpisodeListViewModel.class);
 
         subscribeUiToNetworkStatus(mViewModel.getNetworkOperationStatus());
     }

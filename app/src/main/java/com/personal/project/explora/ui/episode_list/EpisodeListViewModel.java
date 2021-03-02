@@ -3,8 +3,6 @@ package com.personal.project.explora.ui.episode_list;
 import android.app.Application;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,7 +11,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.google.android.exoplayer2.offline.Download;
 import com.personal.project.explora.BasicApp;
 import com.personal.project.explora.EpisodeRepository;
 import com.personal.project.explora.db.Episode;
@@ -33,25 +30,23 @@ import static com.personal.project.explora.service.PlayerServiceConnection.NOTHI
 
 public class EpisodeListViewModel extends AndroidViewModel {
 
-    private static final String TAG = "EpisodeListViewModel";
+    private final Map<Integer, LiveData<List<Episode>>> episodes;
+    private final LiveData<List<Episode>> recentEpisodes;
+    private final LiveData<List<Episode>> downloadedEpisodes;
+    private final EpisodeRepository mRepository;
+    private final Observer<List<Episode>> recentEpisodesObserver;
 
-    private Map<Integer, LiveData<List<Episode>>> episodes;
-    private LiveData<List<Episode>> recentEpisodes;
-    private LiveData<List<Episode>> downloadedEpisodes;
-    private EpisodeRepository mRepository;
-    private Observer<List<Episode>> recentEpisodesObserver;
-
-    private LiveData<Integer> networkOperationStatus;
+    private final LiveData<Integer> networkOperationStatus;
     private MutableLiveData<Event<Integer>> networkOperationStatusEvent;
 
-    private PlayerServiceConnection playerServiceConnection;
-    private MutableLiveData<Integer> nowPlayingId;
-    private MutableLiveData<Boolean> isPlaying;
-    private LiveData<Boolean> networkError;
+    private final PlayerServiceConnection playerServiceConnection;
+    private final MutableLiveData<Integer> nowPlayingId;
+    private final MutableLiveData<Boolean> isPlaying;
+    //private final LiveData<Boolean> networkError;
 
-    private Observer<PlaybackStateCompat> playbackStateObserver;
-    private Observer<MediaMetadataCompat> mediaMetadataObserver;
-    private Observer<Integer> networkOperationStatusObserver;
+    private final Observer<PlaybackStateCompat> playbackStateObserver;
+    private final Observer<MediaMetadataCompat> mediaMetadataObserver;
+    private final Observer<Integer> networkOperationStatusObserver;
 
     public EpisodeListViewModel(@NonNull Application application) {
         super(application);
@@ -75,13 +70,15 @@ public class EpisodeListViewModel extends AndroidViewModel {
         isPlaying = new MutableLiveData<>();
 
         networkOperationStatus = mRepository.getNetworkOperationStatus();
-        networkOperationStatusObserver = status ->
-                networkOperationStatusEvent.postValue(new Event<>(status));
+        networkOperationStatusObserver = status -> {
+            if (status == null) mRepository.refreshRecents();
+            networkOperationStatusEvent.postValue(new Event<>(status));
+        };
         networkOperationStatusEvent = new MutableLiveData<>();
         networkOperationStatus.observeForever(networkOperationStatusObserver);
 
         playerServiceConnection = ((BasicApp)application).getPlayerServiceConnection();
-        networkError = playerServiceConnection.getNetworkFailure();
+        //networkError = playerServiceConnection.getNetworkFailure();
 
         playbackStateObserver = state -> {
             if (state == null) state = EMPTY_PLAYBACK_STATE;
@@ -134,13 +131,13 @@ public class EpisodeListViewModel extends AndroidViewModel {
         return networkOperationStatusEvent;
     }
 
-    public LiveData<Boolean> getNetworkError() {
+    /*public LiveData<Boolean> getNetworkError() {
         return networkError;
     }
 
     public LiveData<Boolean> getIsConnected() {
         return playerServiceConnection.getIsConnected();
-    }
+    }*/
 
     public LiveData<Integer> getNowPlayingId() {
         return nowPlayingId;

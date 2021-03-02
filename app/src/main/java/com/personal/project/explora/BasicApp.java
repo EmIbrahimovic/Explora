@@ -22,7 +22,6 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.personal.project.explora.db.EpisodeDatabase;
 import com.personal.project.explora.service.PlayerServiceConnection;
@@ -33,9 +32,7 @@ import com.personal.project.explora.utils.AppStartUtil;
  */
 public class BasicApp extends Application {
 
-    private static final String TAG = "BasicApp";
-
-    private AppExecutors mAppExecutors;
+    private final AppExecutors mAppExecutors;
 
     SharedPreferences sharedPreferences;
 

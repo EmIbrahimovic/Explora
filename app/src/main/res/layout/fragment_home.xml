@@ -1,89 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backgroundColor"
-    tools:context=".ui.home.HomeFragment"
-    android:padding="16dp">
-    <!--android:gravity="center"-->
+    android:fillViewport="true"
+    android:orientation="vertical"
+    tools:context=".ui.home.HomeFragment">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/backgroundColor"
+        android:fillViewport="true"
+        tools:context=".ui.home.HomeFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/whole_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toTopOf="@+id/author"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/home_title"
+                    style="@style/HomeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="64dp"
+                    android:gravity="center"
+                    android:text="@string/app_name"
+                    android:textSize="@dimen/title_text_size"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/home_description"
+                    style="@style/HomeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="24dp"
+                    android:text="@string/home_description" />
+
+                <TextView
+                    android:id="@+id/visnjan_link_text_view"
+                    style="@style/HomeLinkTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="24dp"
+                    android:text="@string/visnjan_observatory" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/visnjan_button"
+                        android:layout_width="@dimen/circle_button_dimen"
+                        android:layout_height="@dimen/circle_button_dimen"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/circle_button"
+                        android:backgroundTint="@android:color/white"
+                        android:contentDescription="@string/visnjan_button_desc" />
+
+                    <ImageButton
+                        android:id="@+id/fb_button"
+                        android:layout_width="@dimen/circle_button_dimen"
+                        android:layout_height="@dimen/circle_button_dimen"
+                        android:layout_marginStart="4dp"
+                        android:backgroundTint="@android:color/holo_blue_dark"
+                        android:background="@drawable/circle_button"
+                        android:contentDescription="@string/visnjan_fb_button_desc" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/hrt_link_text_view"
+                    style="@style/HomeLinkTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    android:text="@string/croatian_radio" />
+
+                <ImageButton
+                    android:id="@+id/hrt_button"
+                    android:layout_width="@dimen/circle_button_dimen"
+                    android:layout_height="@dimen/circle_button_dimen"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circle_button"
+                    android:contentDescription="@string/radio_pula_button_desc" />
+
+                <TextView
+                    style="@style/HomeLinkTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    android:text="@string/explorers_club" />
+
+                <ImageButton
+                    android:id="@+id/explora_button"
+                    android:layout_width="@dimen/circle_button_dimen"
+                    android:layout_height="@dimen/circle_button_dimen"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circle_button"
+                    android:backgroundTint="@android:color/holo_orange_dark"
+                    android:contentDescription="@string/explora_button_desc" />
+
+                <TextView
+                    style="@style/HomeLinkTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    android:text="@string/other_talks" />
+
+                <ImageButton
+                    android:id="@+id/yt_button"
+                    android:layout_width="@dimen/circle_button_dimen"
+                    android:layout_height="@dimen/circle_button_dimen"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circle_button"
+                    android:backgroundTint="@android:color/holo_red_light"
+                    android:contentDescription="@string/korado_talks_button_desc" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:gravity="start"
+                android:text="@string/author"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <TextView
+        android:id="@+id/version_code"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_gravity="center_vertical"
-        android:orientation="vertical" >
+        android:gravity="start"
+        android:textSize="12sp"
+        tools:text="Version code: 0.00.0" />
 
-        <TextView
-            android:id="@+id/home_title"
-            style="@style/HomeText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/app_name"
-            android:textSize="90sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/home_description"
-            style="@style/HomeText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:padding="24dp"
-            android:text="@string/home_description"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/visnjan_link_text_view"
-            style="@style/HomeText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="24dp"
-            android:text="@string/visnjan_observatory"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/circle_button"
-                android:src="@drawable/ic_home" />
-
-            <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_margin="8dp"
-                android:background="@drawable/circle_button"
-                android:src="@drawable/ic_home" />
-
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/hrt_link_text_view"
-            style="@style/HomeText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:text="@string/croatian_radio"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/circle_button"
-            android:src="@drawable/ic_home" />
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>

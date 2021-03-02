@@ -8,17 +8,18 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
+import java.util.Objects;
 
 import static android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID;
 
 public class PlayerServiceConnection {
 
+    private static final String TAG = "PlayerServiceConnection";
     public static final PlaybackStateCompat EMPTY_PLAYBACK_STATE = new PlaybackStateCompat.Builder()
             .setState(PlaybackStateCompat.STATE_NONE, 0, 0f)
             .build();
@@ -26,18 +27,18 @@ public class PlayerServiceConnection {
             .putString(METADATA_KEY_MEDIA_ID, "-1")
             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 0)
             .build();
-    private static final String TAG = "PlayerServiceConnection";
+
     private static PlayerServiceConnection instance;
-    private Application context;
+    private final Application context;
 
-    private MutableLiveData<Boolean> isConnected;
-    private MutableLiveData<Boolean> networkFailure;
+    private final MutableLiveData<Boolean> isConnected;
+    private final MutableLiveData<Boolean> networkFailure;
 
-    private MutableLiveData<PlaybackStateCompat> playbackState;
-    private MutableLiveData<MediaMetadataCompat> nowPlaying;
+    private final MutableLiveData<PlaybackStateCompat> playbackState;
+    private final MutableLiveData<MediaMetadataCompat> nowPlaying;
 
-    private MediaBrowserConnectionCallback mediaBrowserConnectionCallback;
-    private MediaBrowserCompat mediaBrowser;
+    private final MediaBrowserConnectionCallback mediaBrowserConnectionCallback;
+    private final MediaBrowserCompat mediaBrowser;
     private MediaControllerCompat mediaController;
 
     public PlayerServiceConnection(Application context) {
@@ -73,18 +74,6 @@ public class PlayerServiceConnection {
         }
         return instance;
     }
-
-    /*public void onActivityCreated() {
-        mediaBrowser = new MediaBrowserCompat(
-                context,
-                new ComponentName(context, PlayerService.class),
-                mediaBrowserConnectionCallback,
-                null);
-    }
-
-    public void onActivityStarted() {
-        mediaBrowser.connect();
-    }*/
 
     public MediaControllerCompat.TransportControls getTransportControls() {
         return mediaController.getTransportControls();
@@ -123,14 +112,14 @@ public class PlayerServiceConnection {
         public void onConnectionSuspended() {
             // The Service has crashed. Disable transport controls until it automatically reconnects
             isConnected.postValue(false);
-            Log.w(TAG, "onConnectionSuspended: The Service has crashed.");
+            //Log.w(TAG, "onConnectionSuspended: The Service has crashed.");
         }
 
         @Override
         public void onConnectionFailed() {
             // The Service has refused our connection
             isConnected.postValue(false);
-            Log.w(TAG, "onConnectionFailed: The Service has refused our connection");
+            //Log.w(TAG, "onConnectionFailed: The Service has refused our connection");
         }
     }
 
@@ -138,7 +127,7 @@ public class PlayerServiceConnection {
 
         @Override
         public void onSessionEvent(String event, Bundle extras) {
-            if (event.equals(PlayerService.NETWORK_FAILURE))
+            if (Objects.equals(event, PlayerService.NETWORK_FAILURE))
                 networkFailure.postValue(true);
         }
 
@@ -156,7 +145,7 @@ public class PlayerServiceConnection {
         public void onMetadataChanged(MediaMetadataCompat metadata) {
 
             if (metadata.getString(METADATA_KEY_MEDIA_ID) == null ||
-                    metadata.getString(METADATA_KEY_MEDIA_ID).equals("-1") ||
+                    Objects.equals(metadata.getString(METADATA_KEY_MEDIA_ID), "-1") ||
                     metadata.getDescription().getTitle() == null)
                 return;
 

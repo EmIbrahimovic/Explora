@@ -4,7 +4,6 @@ import android.app.Application;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -15,6 +14,7 @@ import com.personal.project.explora.db.EpisodeDatabase;
 import com.personal.project.explora.feed.Channel;
 import com.personal.project.explora.feed.FeedAPI;
 import com.personal.project.explora.feed.Rss;
+import com.personal.project.explora.service.download.DownloadUtil;
 import com.personal.project.explora.utils.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,20 +34,20 @@ public class EpisodeRepository {
 
     private static final String TAG = "EpisodeRepository";
 
-    private AppExecutors mExecutors;
+    private final AppExecutors mExecutors;
 
     private static EpisodeRepository instance;
 
-    private EpisodeDao episodeDao;
-    private FeedAPI feedAPI;
+    private final EpisodeDao episodeDao;
+    private final FeedAPI feedAPI;
 
     private static final String BASE_URL = "https://radio.hrt.hr/";
     private static final String FEED_URL = "https://radio.hrt.hr/podcast/rss/radio-pula/1277/explora.xml";
 
-    private Map<Integer, LiveData<List<Episode>>> allEpisodes;
+    private final Map<Integer, LiveData<List<Episode>>> allEpisodes;
     private List<Episode> recents;
 
-    private MutableLiveData<Integer> networkOperationSucceeded;
+    private final MutableLiveData<Integer> networkOperationSucceeded;
     public static final int SUCCESS = 1;
     public static final int FAILURE = -1;
     public static final int LOADING = 0;
@@ -63,10 +63,11 @@ public class EpisodeRepository {
         EpisodeDatabase database = ((BasicApp)application).getDatabase();
         episodeDao = database.episodeDao();
 
+        DownloadUtil.setRealDownloadsState(application);
+
         feedAPI = buildFeedAPI();
         networkOperationSucceeded = new MutableLiveData<>();
-        networkOperationSucceeded.setValue(LOADING);
-        refreshRecents();
+        networkOperationSucceeded.postValue(null);
 
         allEpisodes = populateEpisodeMap();
     }
@@ -85,6 +86,7 @@ public class EpisodeRepository {
 
     private FeedAPI buildFeedAPI() {
 
+        //noinspection deprecation
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(SimpleXmlConverterFactory.create())
@@ -106,10 +108,6 @@ public class EpisodeRepository {
     /*
         GETTERS
      */
-
-    public LiveData<List<Episode>> getEpisodesFromYear(int year) {
-        return allEpisodes.get(year);
-    }
 
     public Map<Integer, LiveData<List<Episode>>> getAllEpisodes() {
         return allEpisodes;
@@ -136,29 +134,14 @@ public class EpisodeRepository {
     }
 
     public void update(final Episode episode) {
-        mExecutors.diskIO().execute(() -> {
-            episodeDao.update(episode);
-            Log.d(TAG, "update: updated this guy " + episode);
-        });
+        mExecutors.diskIO().execute(() -> episodeDao.update(episode));
     }
-
-    /*public void delete(final Episode episode) {
-        mExecutors.diskIO().execute(() -> episodeDao.delete(episode));
-    }*/
-
-//    public void getEpisodeFromId(int id, EpisodeRetrievedListener listener) {
-//        mExecutors.diskIO().execute(() -> {
-//            Episode episode = episodeDao.getEpisodeSync(id);
-//            listener.onEpisodeRetrieved(episode);
-//        });
-//    }
 
     /** very special use case with a probably better solution but hey */
     public void getEpisodeFromIdForPrepare(int id, EpisodeRetrievedListenerForPrepare listener,
                                            boolean playWhenReady, Bundle extras) {
         mExecutors.diskIO().execute(() -> {
             Episode episode = episodeDao.getEpisodeSync(id);
-            Log.d(TAG, "getEpisodeFromIdForPrepare: needed episode with id=" + id + "; gotten episode=" + episode);
             listener.getHandler().post(
                     () -> listener.onEpisodeRetrieved(episode, playWhenReady, extras));
         });
@@ -176,6 +159,24 @@ public class EpisodeRepository {
         });
     }
 
+
+    public void updateDownloads(List<Integer> downloadedIds) {
+        mExecutors.diskIO().execute(() -> {
+
+            List<Integer> currentlyDownloaded = episodeDao.getDownloadedEpisodesIdSync();
+            for (Integer id : currentlyDownloaded) {
+                if (!downloadedIds.contains(id))
+                    getFromIdAndUpdateDownloadId(id, Episode.NOT_DOWNLOADED);
+            }
+
+            for (Integer id : downloadedIds) {
+                if (!currentlyDownloaded.contains(id))
+                    getFromIdAndUpdateDownloadId(id, Episode.DOWNLOADED);
+            }
+
+        });
+    }
+
     /*
         NETWORK OPERATIONS
      */
@@ -188,7 +189,7 @@ public class EpisodeRepository {
         rssCall.enqueue(new Callback<Rss>() {
             @Override
             public void onResponse(@NotNull Call<Rss> call, @NotNull Response<Rss> response) {
-                Log.d(TAG, "onResponse: " + response.code());
+                //Log.d(TAG, "onResponse: " + response.code());
                 if (!response.isSuccessful() || response.body() == null) {
                     networkOperationSucceeded.postValue(FAILURE);
                     return;
@@ -203,7 +204,7 @@ public class EpisodeRepository {
 
             @Override
             public void onFailure(@NotNull Call<Rss> call, @NotNull Throwable t) {
-                Log.e(TAG, "onFailure: Unable to retrieve RSS " + t.getMessage());
+                //Log.e(TAG, "onFailure: Unable to retrieve RSS " + t.getMessage());
                 networkOperationSucceeded.postValue(FAILURE);
             }
         });
@@ -211,7 +212,7 @@ public class EpisodeRepository {
 
     private void updateDB(List<Episode> recentEpisodes) {
 
-        mExecutors.diskIO().execute(() -> {
+        mExecutors.networkIO().execute(() -> {
             List<Episode> toInsert = new ArrayList<>();
             for (Episode recentEpisode : recentEpisodes) {
                 Episode lookup = episodeDao.getEpisodeByTitle(recentEpisode.getTitle());
@@ -251,13 +252,10 @@ public class EpisodeRepository {
     }
 
     public interface EpisodeRetrievedListenerForPrepare {
+
         Handler getHandler();
 
         void onEpisodeRetrieved(Episode episode, boolean playWhenReady, Bundle extras);
-    }
-
-    public interface EpisodeRetrievedListener {
-        void onEpisodeRetrieved(Episode episode);
     }
 
 }

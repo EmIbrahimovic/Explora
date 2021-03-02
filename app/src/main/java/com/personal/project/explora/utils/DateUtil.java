@@ -18,13 +18,13 @@ public class DateUtil {
         try {
             localDate = LocalDate.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME);
         } catch (DateTimeParseException e) {
-            Log.e(TAG, "parse: Unable to parse date " + date, e);
+            //Log.e(TAG, "parse: Unable to parse date " + date, e);
         }
 
         return localDate;
     }
 
-    public static LocalDate parseMyDate(@NonNull String date) {
+    /*public static LocalDate parseMyDate(@NonNull String date) {
         LocalDate localDate = null;
         try {
             localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy."));
@@ -33,7 +33,7 @@ public class DateUtil {
         }
 
         return localDate;
-    }
+    }*/
 
     public static String formatMyDate(@NonNull LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy.");

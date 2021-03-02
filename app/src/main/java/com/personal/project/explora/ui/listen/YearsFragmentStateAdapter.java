@@ -1,7 +1,5 @@
 package com.personal.project.explora.ui.listen;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -9,10 +7,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import static com.personal.project.explora.utils.YearsData.YEARS;
 
 public class YearsFragmentStateAdapter extends FragmentStateAdapter {
-
-    private static final String TAG = "YearsFragmentStateAdapt";
-
-    // TODO: FIND A WAY TO DYNAMICALLY ASSIGN YEARS
 
     public YearsFragmentStateAdapter(@NonNull Fragment fragment) {
         super(fragment);

@@ -12,7 +12,6 @@ import android.os.ResultReceiver;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -61,8 +60,6 @@ public class PlayerService extends MediaBrowserServiceCompat
     private SimpleExoPlayer mExoPlayer;
     private PlaybackStateListener mPlaybackStateListener;
     private MediaSessionCompat mMediaSession;
-    private MediaSessionCompat.Token mSessionToken;
-    private MediaSessionConnector mMediaSessionConnector;
     private boolean isForegroundService = false;
     private AppExecutors mExecutors;
 
@@ -90,7 +87,7 @@ public class PlayerService extends MediaBrowserServiceCompat
         mMediaSession.setSessionActivity(sessionActivityPendingIntent);
         mMediaSession.setActive(true);
 
-        mSessionToken = mMediaSession.getSessionToken();
+        MediaSessionCompat.Token mSessionToken = mMediaSession.getSessionToken();
 
         setSessionToken(mSessionToken);
 
@@ -100,7 +97,7 @@ public class PlayerService extends MediaBrowserServiceCompat
                 new PlayerNotificationListener()
         );
 
-        mMediaSessionConnector = new MediaSessionConnector(mMediaSession);
+        MediaSessionConnector mMediaSessionConnector = new MediaSessionConnector(mMediaSession);
         mMediaSessionConnector.setPlaybackPreparer(new MyPlaybackPreparer());
         mMediaSessionConnector.setPlayer(mExoPlayer);
 
@@ -189,16 +186,17 @@ public class PlayerService extends MediaBrowserServiceCompat
         mExoPlayer.setMediaItem(mediaItem, playbackStartPositionMs);
         mExoPlayer.prepare();
         mMediaSession.setMetadata(itemToPlay);
-        Log.d(TAG, "prepareItem: prepared the guy");
     }
 
     @Override
     public void onEpisodeRetrieved(Episode episode, boolean playWhenReady, Bundle extras) {
-        if (currentlyPlaying != null) saveLastPosition();
+        if (currentlyPlaying != null && mExoPlayer.getCurrentPosition() != 0) {
+            saveLastPosition();
+        }
         currentlyPlaying = episode;
         if (currentlyPlaying == null) {
             Toast.makeText(PlayerService.this, "An error occurred", Toast.LENGTH_LONG).show();
-            Log.e(TAG, "onPrepareFromMediaId - onEpisodeRetrieved: episode is null");
+            //Log.e(TAG, "onPrepareFromMediaId - onEpisodeRetrieved: episode is null");
             return;
         }
 
@@ -213,7 +211,7 @@ public class PlayerService extends MediaBrowserServiceCompat
                 .build();
 
         long playbackStartPositionMs = currentlyPlaying.getLastPosition();
-        if (playbackStartPositionMs == currentlyPlaying.getDuration()) {
+        if (playbackStartPositionMs + 1500 >= currentlyPlaying.getDuration()) {
             playbackStartPositionMs = 0L;
         }
 
@@ -285,22 +283,22 @@ public class PlayerService extends MediaBrowserServiceCompat
         @Override
         public void onPlayerError(ExoPlaybackException error) {
 
-            String message = "An unexpected error occured.";
+            String message = "An unexpected error occurred.";
 
             switch (error.type) {
 
                 case ExoPlaybackException.TYPE_SOURCE:
                     message = "Unable to locate selected media. No internet connection.";
-                    Log.e(TAG, "TYPE_SOURCE: " + error.getSourceException().getMessage());
+                    //Log.e(TAG, "TYPE_SOURCE: " + error.getSourceException().getMessage());
                     break;
                 case ExoPlaybackException.TYPE_RENDERER:
-                    Log.e(TAG, "TYPE_RENDERER: " + error.getRendererException().getMessage());
+                    //Log.e(TAG, "TYPE_RENDERER: " + error.getRendererException().getMessage());
                     break;
                 case ExoPlaybackException.TYPE_UNEXPECTED:
-                    Log.e(TAG, "TYPE_UNEXPECTED: " + error.getUnexpectedException().getMessage());
+                    //Log.e(TAG, "TYPE_UNEXPECTED: " + error.getUnexpectedException().getMessage());
                     break;
                 case ExoPlaybackException.TYPE_REMOTE:
-                    Log.e(TAG, "TYPE_REMOTE: " + error.getMessage());
+                    //Log.e(TAG, "TYPE_REMOTE: " + error.getMessage());
                     break;
             }
 
