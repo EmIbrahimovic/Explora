@@ -12,7 +12,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
+        versionName "0.9.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -98,28 +98,14 @@ dependencies {
 
     ext.checkerFrameworkVersion = '3.10.0'
     implementation "org.checkerframework:checker-qual-android:${checkerFrameworkVersion}"
-    // or if you use no annotations in source code the above line could be
-    // compileOnly "org.checkerframework:checker-qual-android:${checkerFrameworkVersion}"
     annotationProcessor "org.checkerframework:checker:${checkerFrameworkVersion}"
     errorproneJavac 'com.google.errorprone:javac:9+181-r4173-1'
-//
-//    /*         TESTING DEPENDENCIES      */
-//    // Assertions
-//    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-//    androidTestImplementation 'androidx.test.ext:truth:1.3.0'
-//    androidTestImplementation 'com.google.truth:truth:1.0'
-//
-//    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-//
-//    androidTestImplementation 'androidx.test:core:1.3.0'
-//
-//    // AndroidJUnitRunner and JUnit Rules
-//    androidTestImplementation 'androidx.test:runner:1.3.0'
-//    androidTestImplementation 'androidx.test:rules:1.3.0'
-//
-//    androidTestImplementation 'androidx.arch.core:core-testing:2.1.0'
 
+    configurations {
+        //noinspection DuplicatePlatformClasses
+        all*.exclude group: 'xpp3', module: 'xpp3'
+        implementation.exclude group: "org.apache.httpcomponents", module: "httpclient"
+    }
 }
 
 gradle.projectsEvaluated {
