@@ -11,8 +11,8 @@ android {
         applicationId "com.personal.project.explora"
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode 1
-        versionName "0.9.0"
+        versionCode 5
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

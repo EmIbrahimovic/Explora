@@ -223,7 +223,7 @@ public class EpisodeRepository {
                         toInsert.add(recentEpisode);
                     }
                 }
-                else if (lookup.getLastUpdated().equals(recentEpisode.getLastUpdated())) {
+                else if (lookup.areContentsComplete()) {
                     break;
                 }
                 else if (recentEpisode.completes(lookup)) {

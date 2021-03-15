@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.personal.project.explora.BuildConfig;
 import com.personal.project.explora.R;
-import com.personal.project.explora.utils.AppStartUtil;
 import com.squareup.picasso.Picasso;
 
 public class HomeFragment extends Fragment {
@@ -80,8 +79,8 @@ public class HomeFragment extends Fragment {
         homeDescription.setMovementMethod(LinkMovementMethod.getInstance());
 
         TextView versionCodeTV = root.findViewById(R.id.version_code);
-        String tvText = getString(R.string.version_code) + ": " + "<a>" +  AppStartUtil.LAST_APP_VERSION + "</a>";
-        versionCodeTV.setText(Html.fromHtml(tvText));
+        String tvText = getString(R.string.version_code) + ": " + BuildConfig.VERSION_NAME;
+        versionCodeTV.setText(tvText);
         versionCodeTV.setOnClickListener(v -> openDialog());
 
         TextView authorTV = root.findViewById(R.id.author);

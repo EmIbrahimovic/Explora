@@ -159,7 +159,7 @@ public class Episode {
      Episode which is being completed must have id and title (by extension also year).
      */
     public boolean completes(Episode other) {
-        if (other.areContentComplete())
+        if (other.areContentsComplete())
             return false;
         
         if (!this.title.equals(other.title))
@@ -178,15 +178,14 @@ public class Episode {
     }
 
     /**
-     Checks if episode has all non-empty fields.
+     Checks if episode has all non-empty important fields.
      */
-    public boolean areContentComplete() {
+    public boolean areContentsComplete() {
         boolean ret = true;
-        if (id == 0) ret = false;
+        if (id <= 0) ret = false;
         if (StringUtils.isEmpty(title)) ret = false;
         if (StringUtils.isEmpty(description)) ret = false;
         if (StringUtils.isEmpty(link)) ret = false;
-        if (StringUtils.isEmpty(lastUpdated)) ret = false;
         
         return ret;
     }

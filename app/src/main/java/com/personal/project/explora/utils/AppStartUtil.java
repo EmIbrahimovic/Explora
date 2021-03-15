@@ -8,8 +8,6 @@ import android.content.pm.PackageManager;
 
 public class AppStartUtil {
 
-    private static final String TAG = "AppStartUtil";
-
     public enum AppStart {
         FIRST_TIME, FIRST_TIME_VERSION, NORMAL
     }
@@ -18,7 +16,7 @@ public class AppStartUtil {
      * The app version code (not the version name!) that was used on the last
      * start of the app.
      */
-    public static final String LAST_APP_VERSION = "0.9.0";
+    private static final String LAST_APP_VERSION = "1";
 
     /**
      * Caches the result of {@link #checkAppStart(Context context, SharedPreferences sharedPreferences)}. To allow idempotent method

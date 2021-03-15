@@ -38,4 +38,5 @@
     <string name="share_button">Dugme za dijeljenje</string>
     <string name="rewind_button">Dugme za premotavanje unazad</string>
     <string name="fast_forward_button">Dugme za premotavanje unaprijed</string>
+    <string name="question_text">Postavi pitanje u emisiju:</string>
 </resources>

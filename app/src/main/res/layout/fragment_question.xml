@@ -10,6 +10,21 @@
     android:padding="16dp"
     tools:context=".ui.question.QuestionFragment">
 
+
+    <TextView
+        style="@style/HomeLinkTitle"
+        android:id="@+id/question_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/question_text"
+        android:padding="16dp"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/card_edit_text_body"/>
+
     <androidx.cardview.widget.CardView
         android:id="@+id/card_edit_text_body"
         android:layout_width="0dp"
@@ -20,10 +35,10 @@
         android:layout_marginBottom="0dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/button_mail"
+        app:layout_constraintBottom_toTopOf="@id/button_mail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="@id/question_text">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -67,6 +82,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/card_edit_text_body" />
+        app:layout_constraintTop_toBottomOf="@id/card_edit_text_body" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

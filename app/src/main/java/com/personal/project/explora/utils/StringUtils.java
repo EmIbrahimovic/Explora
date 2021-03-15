@@ -3,7 +3,7 @@ package com.personal.project.explora.utils;
 public class StringUtils {
 
     public static boolean isEmpty(String obj) {
-        return obj == null || obj.isEmpty();
+        return obj == null || obj.isEmpty() || obj.equals("null");
     }
 
     public static String toTimestamp(int minutes, int seconds) {

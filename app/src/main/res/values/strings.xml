@@ -32,6 +32,7 @@
     <string name="question_subject">Subject</string>
     <string name="send_question_email">Send Email</string>
     <string name="question_body">Question Body…</string>
+    <string name="question_text">Submit a question into the show:</string>
 
     <!-- EpisodeCard and EpisodeAdapter strings -->
     <string name="episode_title">Episode Title</string>
