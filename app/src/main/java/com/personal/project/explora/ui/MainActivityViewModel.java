@@ -72,7 +72,7 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     private void showFragment(Fragment fragment) {
         FragmentNavigationRequest newFragmentNavigationRequest = new FragmentNavigationRequest(
-                fragment, true, null);
+                fragment, false, null);
         Event<FragmentNavigationRequest> newEvent = new Event<>(newFragmentNavigationRequest);
         navigateToFragment.postValue(newEvent);
     }
