@@ -4,37 +4,26 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import static com.personal.project.explora.utils.YearsData.YEARS;
 
 public class YearsFragmentStateAdapter extends FragmentStateAdapter {
 
-    private final List<Integer> years;
-
     public YearsFragmentStateAdapter(@NonNull Fragment fragment) {
         super(fragment);
-        years = new ArrayList<>();
-    }
-
-    public YearsFragmentStateAdapter(@NonNull Fragment fragment, List<Integer> yearList) {
-        super(fragment);
-        years = yearList;
     }
 
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        return YearFragment.newInstance(years.get(position));
+        return YearFragment.newInstance(YEARS[position]);
     }
 
     @Override
     public int getItemCount() {
-        return years.size();
+        return YEARS.length;
     }
 
     public String getItemTitle(int position) {
-        return String.valueOf(years.get(position));
+        return String.valueOf(YEARS[position]);
     }
-
 }

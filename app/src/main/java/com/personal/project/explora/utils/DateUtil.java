@@ -24,7 +24,7 @@ public class DateUtil {
         return localDate;
     }
 
-    public static LocalDate parseMyDate(@NonNull String date) {
+    /*public static LocalDate parseMyDate(@NonNull String date) {
         LocalDate localDate = null;
         try {
             localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy."));
@@ -33,7 +33,7 @@ public class DateUtil {
         }
 
         return localDate;
-    }
+    }*/
 
     public static String formatMyDate(@NonNull LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
@@ -43,18 +43,6 @@ public class DateUtil {
     public static int compareStringDateTimes(String A, String B) {
         LocalDateTime a = LocalDateTime.parse(A);
         LocalDateTime b = LocalDateTime.parse(B);
-        if (a.isEqual(b))
-            return 0;
-
-        if (a.isBefore(b))
-            return 1;
-
-        return -1;
-    }
-
-    public static int compareMyDate(String A, String B) {
-        LocalDate a = parseMyDate(A);
-        LocalDate b = parseMyDate(B);
         if (a.isEqual(b))
             return 0;
 

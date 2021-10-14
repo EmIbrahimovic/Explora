@@ -27,7 +27,6 @@ public class Episode {
     private String title;
     private String description;
     private String link;
-    private String datePublished;
 
     @ColumnInfo(name = "downloadId")
     private int downloadState;
@@ -36,19 +35,11 @@ public class Episode {
     private long duration;
     private String recent;
 
-    public Episode(int year,
-                   String title,
-                   String description,
-                   String link,
-                   String datePublished,
-                   String lastUpdated,
-                   long duration) {
-
+    public Episode(int year, String title, String description, String link, String lastUpdated, long duration) {
         this.year = year;
         this.title = title;
         this.description = description;
         this.link = link;
-        this.datePublished = datePublished;
         this.downloadState = NOT_DOWNLOADED;
         this.lastUpdated = lastUpdated;
         this.lastPosition = 0L;
@@ -62,7 +53,6 @@ public class Episode {
         this.title = other.title;
         this.description = other.description;
         this.link = other.link;
-        this.datePublished = other.datePublished;
         this.downloadState = other.downloadState;
         this.lastUpdated = other.lastUpdated;
         this.lastPosition = other.lastPosition;
@@ -72,14 +62,13 @@ public class Episode {
 
     /**
      * Duration should never be not set, but the only time I use this method I call setDuration a
-     * bit later on (BAD CODE I KNOW)
+     * bit later on (BAD CODE I KNOW, IM RUNNING OUT OF DEBUGGING TIME)
      */
-    public Episode(String title, String link, String description, LocalDate date, LocalDate lastUpdated) {
+    public Episode(String link, String description, LocalDate date, LocalDate lastUpdated) {
         this(date.getYear(),
-                title,
+                "Emisija " + DateUtil.formatMyDate(date),
                 description,
                 link,
-                DateUtil.formatMyDate(date),
                 DateUtil.formatMyDate(lastUpdated),
                 0L);
     }
@@ -107,8 +96,6 @@ public class Episode {
     public String getLink() {
         return link;
     }
-
-    public String getDatePublished() { return datePublished; }
 
     public static boolean isValidDownloadId(int downloadId) {
         return downloadId == DOWNLOADED || downloadId == NOT_DOWNLOADED || downloadId == DOWNLOADING;
@@ -219,7 +206,6 @@ public class Episode {
         //this has title
         if (!StringUtils.isEmpty(other.description)) this.description = other.description;
         if (!StringUtils.isEmpty(other.link)) this.link = other.link;
-        //this has date
         if (!StringUtils.isEmpty(other.lastUpdated)) this.lastUpdated = other.lastUpdated;
         //no lastposition
         //no downloadID
@@ -235,7 +221,6 @@ public class Episode {
                 title.equals(episode.title) &&
                 Objects.equals(description, episode.description) &&
                 Objects.equals(link, episode.link) &&
-                Objects.equals(datePublished, episode.datePublished) &&
                 downloadState == episode.downloadState &&
                 Objects.equals(lastUpdated, episode.lastUpdated) &&
                 lastPosition == episode.lastPosition &&
@@ -245,8 +230,7 @@ public class Episode {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, year, title, description, link, datePublished, downloadState,
-                lastUpdated, lastPosition, duration, recent);
+        return Objects.hash(id, year, title, description, link, downloadState, lastUpdated, lastPosition, duration, recent);
     }
 
     @NonNull
@@ -254,7 +238,6 @@ public class Episode {
     public String toString() {
         return "[ ID: " + id + "; " +
                 "Title: " + title + "; " +
-                "Date Published: " + datePublished + "; " +
                 "DownloadId: " + downloadState + "; " +
                 "LastPosition: " + lastPosition + "; " +
                 "Duration: " + duration + "; " +

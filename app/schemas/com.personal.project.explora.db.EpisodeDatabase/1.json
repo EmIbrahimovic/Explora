@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "49ed39a692840f960263291cec70dd11",
+    "identityHash": "8a7da5364c26cd7036cb8d9078e83ed8",
     "entities": [
       {
         "tableName": "episodes_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `title` TEXT, `description` TEXT, `link` TEXT, `datePublished` TEXT, `downloadId` INTEGER NOT NULL, `lastUpdated` TEXT, `lastPosition` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `recent` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `title` TEXT, `description` TEXT, `link` TEXT, `downloadId` INTEGER NOT NULL, `lastUpdated` TEXT, `lastPosition` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `recent` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -39,13 +39,7 @@
             "notNull": false
           },
           {
-            "fieldPath": "datePublished",
-            "columnName": "datePublished",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "downloadState",
+            "fieldPath": "downloadId",
             "columnName": "downloadId",
             "affinity": "INTEGER",
             "notNull": true
@@ -88,7 +82,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '49ed39a692840f960263291cec70dd11')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8a7da5364c26cd7036cb8d9078e83ed8')"
     ]
   }
 }
