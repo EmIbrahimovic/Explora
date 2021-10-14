@@ -57,7 +57,7 @@ public class Channel implements Serializable {
 
         List<Episode> episodes = new ArrayList<>();
         for (Item item : items) {
-            episodes.add(item.toEpisode(getLastBuildLocalDate()));
+            episodes.add(item.toEpisode());
         }
 
         return episodes;

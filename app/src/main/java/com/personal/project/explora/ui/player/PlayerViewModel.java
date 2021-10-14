@@ -27,7 +27,7 @@ public class PlayerViewModel extends AndroidViewModel {
 
     public static final int RES_PLAY_ARROW = R.drawable.exo_controls_play;
     public static final int RES_PAUSE_LINES = R.drawable.exo_controls_pause;
-    public static final int RES_REPLAY = R.drawable.ic_replay_32;
+    public static final int RES_REPLAY = R.drawable.ic_replay;
 
     private final Handler handler;
 

@@ -10,7 +10,7 @@ public class YearsData {
     public static final int[] YEARS = { 2021, 2020, 2019, 2018, 2017 };
 
     public static final int[] YEAR_IMAGE_RES = {
-            R.drawable.pic_2021,
+            R.drawable.pic_2020,
             R.drawable.pic_2020,
             R.drawable.pic_2019,
             R.drawable.pic_2018,

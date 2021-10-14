@@ -55,13 +55,11 @@ public class Item implements Serializable {
     Uses Episode(String link, String description, LocalDate date, LocalDate lastUpdated).
     Title is made by the constructor, and rest of the fields are null.
      */
-    public Episode toEpisode(LocalDate lastUpdated) {
+    public Episode toEpisode() {
         return new Episode(
-                this.getTitle(),
                 this.getLink(),
                 this.getDescription(),
-                DateUtil.parse(this.getDate()),
-                lastUpdated);
+                DateUtil.parse(this.getDate()));
     }
 
 }

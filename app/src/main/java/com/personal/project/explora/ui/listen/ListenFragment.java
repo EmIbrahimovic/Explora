@@ -55,12 +55,6 @@ public class ListenFragment extends Fragment {
         mViewPager = mBinding.yearsViewPager;
         tabs = mBinding.yearTabs;
 
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
         mViewModel = new ViewModelProvider(requireActivity()).get(EpisodeListViewModel.class);
 
         subscribeUiToNetworkStatus(mViewModel.getNetworkOperationStatus());

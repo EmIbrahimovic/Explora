@@ -58,8 +58,8 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mViewModel = new ViewModelProvider(requireActivity()).get(EpisodeListViewModel.class);
         mMainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);

@@ -31,9 +31,6 @@ public interface EpisodeDao {
     @Query("select * from episodes_table where id = :episode_id")
     Episode getEpisodeSync(int episode_id);
 
-    @Query("select * from episodes_table where title = :title")
-    Episode getEpisodeByTitle(String title);
-
     @Query("select * from episodes_table where datePublished = :datePublished")
     Episode getEpisodeByDatePublished(String datePublished);
 

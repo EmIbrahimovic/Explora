@@ -16,6 +16,8 @@ import java.util.Objects;
 @Entity(tableName = "episodes_table")
 public class Episode {
 
+    private static final String EPISODE = "Emisija";
+
     public static final int NOT_DOWNLOADED = 0;
     public static final int DOWNLOADING = 1;
     public static final int DOWNLOADED = 2;
@@ -24,33 +26,27 @@ public class Episode {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private int year;
-    private String title;
     private String description;
     private String link;
     private String datePublished;
 
     @ColumnInfo(name = "downloadId")
     private int downloadState;
-    private String lastUpdated;
     private long lastPosition;
     private long duration;
     private String recent;
 
     public Episode(int year,
-                   String title,
                    String description,
                    String link,
                    String datePublished,
-                   String lastUpdated,
                    long duration) {
 
         this.year = year;
-        this.title = title;
         this.description = description;
         this.link = link;
         this.datePublished = datePublished;
         this.downloadState = NOT_DOWNLOADED;
-        this.lastUpdated = lastUpdated;
         this.lastPosition = 0L;
         this.duration = duration;
         this.recent = null;
@@ -59,12 +55,10 @@ public class Episode {
     public Episode(Episode other) {
         this.id = other.id;
         this.year = other.year;
-        this.title = other.title;
         this.description = other.description;
         this.link = other.link;
         this.datePublished = other.datePublished;
         this.downloadState = other.downloadState;
-        this.lastUpdated = other.lastUpdated;
         this.lastPosition = other.lastPosition;
         this.duration = other.duration;
         this.recent = other.recent;
@@ -74,13 +68,11 @@ public class Episode {
      * Duration should never be not set, but the only time I use this method I call setDuration a
      * bit later on (BAD CODE I KNOW)
      */
-    public Episode(String title, String link, String description, LocalDate date, LocalDate lastUpdated) {
+    public Episode(String link, String description, LocalDate date) {
         this(date.getYear(),
-                title,
                 description,
                 link,
                 DateUtil.formatMyDate(date),
-                DateUtil.formatMyDate(lastUpdated),
                 0L);
     }
 
@@ -97,7 +89,7 @@ public class Episode {
     }
 
     public String getTitle() {
-        return title;
+        return EPISODE + " " + datePublished;
     }
 
     public String getDescription() {
@@ -120,10 +112,6 @@ public class Episode {
 
     public int getDownloadState() {
         return downloadState;
-    }
-
-    public String getLastUpdated() {
-        return lastUpdated;
     }
 
     public void setDownloadState(int downloadState) {
@@ -175,7 +163,7 @@ public class Episode {
         if (other.areContentsComplete())
             return false;
         
-        if (!this.title.equals(other.title))
+        if (!this.datePublished.equals(other.datePublished))
             return false;
         
         boolean ret = false;
@@ -196,7 +184,7 @@ public class Episode {
     public boolean areContentsComplete() {
         boolean ret = true;
         if (id <= 0) ret = false;
-        if (StringUtils.isEmpty(title)) ret = false;
+        if (StringUtils.isEmpty(datePublished)) ret = false;
         if (StringUtils.isEmpty(description)) ret = false;
         if (StringUtils.isEmpty(link)) ret = false;
         
@@ -220,7 +208,6 @@ public class Episode {
         if (!StringUtils.isEmpty(other.description)) this.description = other.description;
         if (!StringUtils.isEmpty(other.link)) this.link = other.link;
         //this has date
-        if (!StringUtils.isEmpty(other.lastUpdated)) this.lastUpdated = other.lastUpdated;
         //no lastposition
         //no downloadID
     }
@@ -232,12 +219,10 @@ public class Episode {
         Episode episode = (Episode) o;
         return id == episode.id &&
                 year == episode.year &&
-                title.equals(episode.title) &&
                 Objects.equals(description, episode.description) &&
                 Objects.equals(link, episode.link) &&
                 Objects.equals(datePublished, episode.datePublished) &&
                 downloadState == episode.downloadState &&
-                Objects.equals(lastUpdated, episode.lastUpdated) &&
                 lastPosition == episode.lastPosition &&
                 duration == episode.duration &&
                 Objects.equals(recent, episode.recent);
@@ -245,15 +230,14 @@ public class Episode {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, year, title, description, link, datePublished, downloadState,
-                lastUpdated, lastPosition, duration, recent);
+        return Objects.hash(id, year, description, link, datePublished, downloadState,
+                lastPosition, duration, recent);
     }
 
     @NonNull
     @Override
     public String toString() {
         return "[ ID: " + id + "; " +
-                "Title: " + title + "; " +
                 "Date Published: " + datePublished + "; " +
                 "DownloadId: " + downloadState + "; " +
                 "LastPosition: " + lastPosition + "; " +
