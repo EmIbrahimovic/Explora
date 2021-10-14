@@ -6,10 +6,12 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 
 import com.personal.project.explora.BasicApp;
 import com.personal.project.explora.EpisodeRepository;
@@ -21,16 +23,20 @@ import com.personal.project.explora.utils.Event;
 import com.personal.project.explora.utils.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.personal.project.explora.service.PlayerServiceConnection.EMPTY_PLAYBACK_STATE;
 import static com.personal.project.explora.service.PlayerServiceConnection.NOTHING_PLAYING;
 
 public class EpisodeListViewModel extends AndroidViewModel {
 
-    private final Map<Integer, LiveData<List<Episode>>> episodes;
+    private final LiveData<List<Integer>> years;
+    private Map<Integer, LiveData<List<Episode>>> episodes;
     private final LiveData<List<Episode>> recentEpisodes;
     private final LiveData<List<Episode>> downloadedEpisodes;
     private final EpisodeRepository mRepository;
@@ -52,7 +58,8 @@ public class EpisodeListViewModel extends AndroidViewModel {
         super(application);
 
         mRepository = ((BasicApp)application).getRepository();
-        episodes = mRepository.getAllEpisodes();
+        years = mRepository.getYears();
+        episodes = new HashMap<>();
         recentEpisodes = mRepository.getRecentEpisodes();
         downloadedEpisodes = mRepository.getDownloadedEpisodes();
         recentEpisodesObserver = episodes -> {
@@ -71,7 +78,7 @@ public class EpisodeListViewModel extends AndroidViewModel {
 
         networkOperationStatus = mRepository.getNetworkOperationStatus();
         networkOperationStatusObserver = status -> {
-            if (status == null) mRepository.refreshRecents();
+            if (status == null) mRepository.refreshNewEpisodes();
             networkOperationStatusEvent.postValue(new Event<>(status));
         };
         networkOperationStatusEvent = new MutableLiveData<>();
@@ -106,8 +113,20 @@ public class EpisodeListViewModel extends AndroidViewModel {
         playerServiceConnection.getNowPlaying().observeForever(mediaMetadataObserver);
     }
 
+    public void updateAllEpisodeMap(List<Integer> years)
+    {
+        episodes = new HashMap<>();
+        for (Integer year : years) {
+            episodes.put(year, mRepository.getEpisodesFromYear(year));
+        }
+    }
+
     public void doRefresh() {
-        mRepository.refreshRecents();
+        mRepository.refreshNewEpisodes();
+    }
+
+    public LiveData<List<Integer>> getYears() {
+        return Transformations.distinctUntilChanged(years);
     }
 
     public LiveData<List<Episode>> getEpisodesFromYear(int year) {

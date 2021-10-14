@@ -4,6 +4,7 @@ import android.app.Application;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -44,8 +45,8 @@ public class EpisodeRepository {
     private static final String BASE_URL = "https://radio.hrt.hr/";
     private static final String FEED_URL = "https://radio.hrt.hr/podcast/rss/radio-pula/1277/explora.xml";
 
-    private final Map<Integer, LiveData<List<Episode>>> allEpisodes;
-    private List<Episode> recents;
+    private final LiveData<List<Integer>> years;
+    private List<Episode> newEpisodes;
 
     private final MutableLiveData<Integer> networkOperationSucceeded;
     public static final int SUCCESS = 1;
@@ -69,7 +70,7 @@ public class EpisodeRepository {
         networkOperationSucceeded = new MutableLiveData<>();
         networkOperationSucceeded.postValue(null);
 
-        allEpisodes = populateEpisodeMap();
+        years = episodeDao.getYears();
     }
 
     public static EpisodeRepository getInstance(Application application, AppExecutors executors) {
@@ -86,7 +87,6 @@ public class EpisodeRepository {
 
     private FeedAPI buildFeedAPI() {
 
-        //noinspection deprecation
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(SimpleXmlConverterFactory.create())
@@ -96,22 +96,30 @@ public class EpisodeRepository {
         return retrofit.create(FeedAPI.class);
     }
 
-    private Map<Integer, LiveData<List<Episode>>> populateEpisodeMap() {
+   /* private Map<Integer, LiveData<List<Episode>>> populateEpisodeMap() {
 
         Map<Integer, LiveData<List<Episode>>> episodeMap = new HashMap<>();
         for (int year = 2017; year < 2022; year++) {
             episodeMap.put(year, episodeDao.getEpisodesFromYear(year));
         }
         return episodeMap;
-    }
+    }*/
 
     /*
         GETTERS
      */
 
-    public Map<Integer, LiveData<List<Episode>>> getAllEpisodes() {
-        return allEpisodes;
+    public LiveData<List<Integer>> getYears() {
+        return years;
     }
+
+    public LiveData<List<Episode>> getEpisodesFromYear(int year) {
+        return episodeDao.getEpisodesFromYear(year);
+    }
+
+    /*public Map<Integer, LiveData<List<Episode>>> getAllEpisodes() {
+        return allEpisodes;
+    }*/
 
     public LiveData<List<Episode>> getRecentEpisodes() {
         return episodeDao.getRecentEpisodes();
@@ -181,7 +189,7 @@ public class EpisodeRepository {
         NETWORK OPERATIONS
      */
 
-    public void refreshRecents() {
+    public void refreshNewEpisodes() {
 
         networkOperationSucceeded.postValue(LOADING);
 
@@ -189,46 +197,46 @@ public class EpisodeRepository {
         rssCall.enqueue(new Callback<Rss>() {
             @Override
             public void onResponse(@NotNull Call<Rss> call, @NotNull Response<Rss> response) {
-                //Log.d(TAG, "onResponse: " + response.code());
+                Log.d(TAG, "onResponse: " + response.code());
                 if (!response.isSuccessful() || response.body() == null) {
                     networkOperationSucceeded.postValue(FAILURE);
                     return;
                 }
 
                 Channel channel = response.body().getChannel();
-                recents = channel.getEpisodes();
+                newEpisodes = channel.getEpisodes();
 
                 // updateDB posts success
-                updateDB(recents);
+                updateDB(newEpisodes);
             }
 
             @Override
             public void onFailure(@NotNull Call<Rss> call, @NotNull Throwable t) {
-                //Log.e(TAG, "onFailure: Unable to retrieve RSS " + t.getMessage());
+                Log.e(TAG, "onFailure: Unable to retrieve RSS " + t.getMessage());
                 networkOperationSucceeded.postValue(FAILURE);
             }
         });
     }
 
-    private void updateDB(List<Episode> recentEpisodes) {
+    private void updateDB(List<Episode> newEpisodes) {
 
         mExecutors.networkIO().execute(() -> {
             List<Episode> toInsert = new ArrayList<>();
-            for (Episode recentEpisode : recentEpisodes) {
-                Episode lookup = episodeDao.getEpisodeByTitle(recentEpisode.getTitle());
-                recentEpisode.setDuration(getDuration(recentEpisode));
+            for (Episode newEpisode : newEpisodes) {
+                Episode lookup = episodeDao.getEpisodeByDatePublished(newEpisode.getDatePublished());
+                newEpisode.setDuration(getDuration(newEpisode));
 
                 if (lookup == null) {
-                    if (!StringUtils.isEmpty(recentEpisode.getLink())) {
-                        toInsert.add(recentEpisode);
+                    if (!StringUtils.isEmpty(newEpisode.getLink())) {
+                        toInsert.add(newEpisode);
                     }
                 }
                 else if (lookup.areContentsComplete()) {
                     break;
                 }
-                else if (recentEpisode.completes(lookup)) {
+                else if (newEpisode.completes(lookup)) {
 
-                    lookup.completeContentWith(recentEpisode);
+                    lookup.completeContentWith(newEpisode);
 
                     update(lookup);
                 }

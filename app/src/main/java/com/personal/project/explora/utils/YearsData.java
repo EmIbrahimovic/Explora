@@ -29,6 +29,7 @@ public class YearsData {
             }
         }
 
+        if (year > 2021) return yearRes.get(2021);
         return yearRes.get(year);
     }
 

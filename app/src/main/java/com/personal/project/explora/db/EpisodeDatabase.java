@@ -8,7 +8,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = Episode.class, version = 1)
+@Database(entities = Episode.class, version = 2)
 public abstract class EpisodeDatabase extends RoomDatabase {
 
     private static EpisodeDatabase instance;
@@ -25,7 +25,7 @@ public abstract class EpisodeDatabase extends RoomDatabase {
             synchronized (EpisodeDatabase.class) {
                 if (instance == null) {
                     instance = buildDatabaseFromAsset(context.getApplicationContext());
-                    instance.updateDataBaseCreated(context.getApplicationContext());
+                    instance.updateDatabaseCreated(context.getApplicationContext());
                 }
             }
         }
@@ -38,7 +38,7 @@ public abstract class EpisodeDatabase extends RoomDatabase {
             synchronized (EpisodeDatabase.class) {
                 if (instance == null) {
                     instance = buildDatabase(context.getApplicationContext());
-                    instance.updateDataBaseCreated(context.getApplicationContext());
+                    instance.updateDatabaseCreated(context.getApplicationContext());
                 }
             }
         }
@@ -66,7 +66,7 @@ public abstract class EpisodeDatabase extends RoomDatabase {
 
     }
 
-    private void updateDataBaseCreated(final Context context) {
+    private void updateDatabaseCreated(final Context context) {
         if (context.getDatabasePath(DATABASE_NAME).exists()) {
             setDatabaseCreated();
         }

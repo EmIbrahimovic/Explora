@@ -1,6 +1,7 @@
 package com.personal.project.explora.ui.listen;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,16 +23,38 @@ import com.personal.project.explora.databinding.FragmentListenBinding;
 import com.personal.project.explora.ui.episode_list.EpisodeListViewModel;
 import com.personal.project.explora.utils.Event;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 public class ListenFragment extends Fragment {
+
+    private static final String TAG = "ListenFragment";
 
     FragmentListenBinding mBinding;
 
     EpisodeListViewModel mViewModel;
 
+    YearsFragmentStateAdapter mViewPagerAdapter;
+    ViewPager2 mViewPager;
+    TabLayout tabs;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_listen, container, false);
+        mBinding.setIsLoading(true);
+        mBinding.setIsEmpty(false);
+
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        mViewPagerAdapter = new YearsFragmentStateAdapter(this);
+        mViewPager = mBinding.yearsViewPager;
+        tabs = mBinding.yearTabs;
+
     }
 
     @Override
@@ -41,6 +64,7 @@ public class ListenFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(EpisodeListViewModel.class);
 
         subscribeUiToNetworkStatus(mViewModel.getNetworkOperationStatus());
+        subscribeToYearListChanges(mViewModel.getYears());
     }
 
     private void subscribeUiToNetworkStatus(LiveData<Event<Integer>> networkOperationStatus) {
@@ -59,16 +83,29 @@ public class ListenFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    private void subscribeToYearListChanges(LiveData<List<Integer>> years)
+    {
+        years.observe(getViewLifecycleOwner(), yearsList -> {
+            if (yearsList == null || yearsList.isEmpty()) {
+                // TODO
+                Toast.makeText(getActivity(), "Doživio sam ERROR", Toast.LENGTH_SHORT).show();
 
-        YearsFragmentStateAdapter mViewPagerAdapter = new YearsFragmentStateAdapter(this);
-        ViewPager2 mViewPager = mBinding.yearsViewPager;
-        mViewPager.setAdapter(mViewPagerAdapter);
+                mBinding.setIsLoading(true);
+                Log.e(TAG, "onViewCreated: getYears().observe() - yearsList is empty");
 
-        TabLayout tabs = mBinding.yearTabs;
-        new TabLayoutMediator(tabs, mViewPager,
-                (tab, position) -> tab.setText(mViewPagerAdapter.getItemTitle(position))).attach();
+                return;
+            }
+
+            mBinding.setIsLoading(false);
+
+            mViewModel.updateAllEpisodeMap(yearsList);
+
+            mViewPagerAdapter = new YearsFragmentStateAdapter(this, yearsList);
+            mViewPager.setAdapter(mViewPagerAdapter);
+            new TabLayoutMediator(tabs, mViewPager,
+                    (tab, position) -> tab.setText(mViewPagerAdapter.getItemTitle(position))).attach();
+
+        });
     }
 
     @Override

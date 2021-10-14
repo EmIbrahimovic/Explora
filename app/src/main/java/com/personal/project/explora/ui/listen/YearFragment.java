@@ -11,7 +11,10 @@ import androidx.lifecycle.LiveData;
 
 import com.personal.project.explora.db.Episode;
 import com.personal.project.explora.ui.episode_list.EpisodeListFragment;
+import com.personal.project.explora.utils.DateUtil;
+import com.personal.project.explora.utils.PlayableEpisode;
 
+import java.util.Collections;
 import java.util.List;
 
 public class YearFragment extends EpisodeListFragment {
@@ -37,6 +40,14 @@ public class YearFragment extends EpisodeListFragment {
     @Override
     protected LiveData<List<Episode>> getEpisodes() {
         return super.mViewModel.getEpisodesFromYear(mYear);
+    }
+
+    @Override
+    protected void sortListToDisplay(List<PlayableEpisode> playableEpisodes) {
+
+        Collections.sort(playableEpisodes, (o1, o2) ->
+                DateUtil.compareMyDate(o1.getDatePublished(), o2.getDatePublished()));
+
     }
 
     @Override

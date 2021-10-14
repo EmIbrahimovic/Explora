@@ -45,11 +45,11 @@ public class MainActivity extends AppCompatActivity {
                 playerFragmentCurrent = fragmentRequest.fragment;
                 FragmentTransaction transaction =
                         getSupportFragmentManager().beginTransaction();
-                transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_right,
+                transaction.setCustomAnimations(
+                        R.anim.enter_from_right, R.anim.exit_to_right,
                         R.anim.enter_from_right, R.anim.exit_to_right);
                 transaction.add(
-                        R.id.big_container, fragmentRequest.fragment, fragmentRequest.tag
-                );
+                        R.id.big_container, fragmentRequest.fragment, fragmentRequest.tag);
 
                 if (fragmentRequest.backStack) transaction.addToBackStack(null);
                 transaction.commit();

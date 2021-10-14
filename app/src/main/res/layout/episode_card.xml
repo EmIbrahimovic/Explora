@@ -46,6 +46,13 @@
                 android:contentDescription="@string/options_button" />
         </LinearLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="textStart"
+            style="@style/EpisodeTextDescription"
+            tools:text="01.01.2021." />
+
         <ImageView
             android:id="@+id/episode_image"
             android:layout_width="wrap_content"

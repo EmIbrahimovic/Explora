@@ -84,6 +84,8 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
 
         holder.textViewTitle.setText(currentEpisode.getTitle());
 
+        holder.textViewDate.setText(currentEpisode.getDatePublished());
+
         holder.setDescription(currentEpisode.getDescription());
 
         Picasso.get()
@@ -137,6 +139,7 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
 
         private final CardView container;
         private final TextView textViewTitle;
+        private final TextView textViewDate;
         private final TextView textViewDescription;
         private final TextView textViewLastPosition;
         private final ImageView image;
@@ -149,6 +152,7 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
 
             container = itemView.findViewById(R.id.episode_card_container);
             textViewTitle = itemView.findViewById(R.id.episode_title);
+            textViewDate = itemView.findViewById(R.id.episode_date);
             textViewDescription = itemView.findViewById(R.id.episode_description);
             textViewLastPosition = itemView.findViewById(R.id.episode_last_position);
             image = itemView.findViewById(R.id.episode_image);

@@ -1,12 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
+    <data>
+
+        <variable
+            name="isLoading"
+            type="boolean" />
+
+        <variable
+            name="isEmpty"
+            type="boolean" />
+
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.listen.ListenFragment">
+
+        <TextView
+            android:id="@+id/loading_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/loading"
+            android:textAlignment="center"
+            app:isItEmpty="@{isEmpty}"
+            app:isItLoading="@{isLoading}" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/year_tabs"
@@ -17,7 +39,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tabGravity="center"
-            app:tabMode="scrollable" />
+            app:tabMode="scrollable"
+            app:showHideLoading="@{isLoading}"
+            app:showHideEmpty="@{isEmpty}" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/years_view_pager"
@@ -26,7 +50,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/year_tabs" />
+            app:layout_constraintTop_toBottomOf="@id/year_tabs"
+            app:showHideLoading="@{isLoading}"
+            app:showHideEmpty="@{isEmpty}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
