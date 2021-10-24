@@ -12,6 +12,9 @@ import java.time.LocalDate;
 @Root(name = "item", strict =  false)
 public class Item implements Serializable {
 
+    @Element(name = "title")
+    private String title;
+
     @Element(name = "link")
     private String link;
 
@@ -21,12 +24,19 @@ public class Item implements Serializable {
     @Element(name = "pubDate")
     private String date;
 
-    public Item(@Element(name = "link") String link,
+    public Item(@Element(name = "title") String title,
+                @Element(name = "link") String link,
                 @Element(name = "description", required = false) String description,
                 @Element(name = "pubDate") String date) {
+        this.title = title;
         this.link = link;
         this.description = description;
         this.date = date;
+    }
+
+    public String getTitle()
+    {
+        return title;
     }
 
     public String getLink() {
@@ -45,11 +55,11 @@ public class Item implements Serializable {
     Uses Episode(String link, String description, LocalDate date, LocalDate lastUpdated).
     Title is made by the constructor, and rest of the fields are null.
      */
-    public Episode toEpisode(LocalDate lastUpdated) {
-        return new Episode(this.getLink(),
+    public Episode toEpisode() {
+        return new Episode(
+                this.getLink(),
                 this.getDescription(),
-                DateUtil.parse(this.getDate()),
-                lastUpdated);
+                DateUtil.parse(this.getDate()));
     }
 
 }

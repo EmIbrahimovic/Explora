@@ -1,2 +1,1 @@
-Verzija 1.0.0
-- Prva javna verzija
+Verzija 1.0.2

@@ -188,7 +188,6 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
             this.position = position;
         }
 
-        @SuppressLint("NonConstantResourceId")
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
