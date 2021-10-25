@@ -14,6 +14,7 @@ import com.personal.project.explora.db.EpisodeDao;
 import com.personal.project.explora.db.EpisodeDatabase;
 import com.personal.project.explora.feed.Channel;
 import com.personal.project.explora.feed.FeedAPI;
+import com.personal.project.explora.feed.Item;
 import com.personal.project.explora.feed.Rss;
 import com.personal.project.explora.service.download.DownloadUtil;
 import com.personal.project.explora.utils.StringUtils;
@@ -23,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,7 +46,6 @@ public class EpisodeRepository {
     private static final String FEED_URL = "https://radio.hrt.hr/podcast/rss/radio-pula/1277/explora.xml";
 
     private final LiveData<List<Integer>> years;
-    private List<Episode> newEpisodes;
 
     private final MutableLiveData<Integer> networkOperationSucceeded;
     public static final int SUCCESS = 1;
@@ -96,15 +95,6 @@ public class EpisodeRepository {
         return retrofit.create(FeedAPI.class);
     }
 
-   /* private Map<Integer, LiveData<List<Episode>>> populateEpisodeMap() {
-
-        Map<Integer, LiveData<List<Episode>>> episodeMap = new HashMap<>();
-        for (int year = 2017; year < 2022; year++) {
-            episodeMap.put(year, episodeDao.getEpisodesFromYear(year));
-        }
-        return episodeMap;
-    }*/
-
     /*
         GETTERS
      */
@@ -116,10 +106,6 @@ public class EpisodeRepository {
     public LiveData<List<Episode>> getEpisodesFromYear(int year) {
         return episodeDao.getEpisodesFromYear(year);
     }
-
-    /*public Map<Integer, LiveData<List<Episode>>> getAllEpisodes() {
-        return allEpisodes;
-    }*/
 
     public LiveData<List<Episode>> getRecentEpisodes() {
         return episodeDao.getRecentEpisodes();
@@ -204,10 +190,9 @@ public class EpisodeRepository {
                 }
 
                 Channel channel = response.body().getChannel();
-                newEpisodes = channel.getEpisodes();
 
-                // updateDB posts success
-                updateDB(newEpisodes);
+                // updateDBWithItems posts success
+                updateDBWithItems(channel.getItems());
             }
 
             @Override
@@ -218,13 +203,21 @@ public class EpisodeRepository {
         });
     }
 
-    private void updateDB(List<Episode> newEpisodes) {
+    private void updateDBWithItems(List<Item> items) {
 
         mExecutors.networkIO().execute(() -> {
             List<Episode> toInsert = new ArrayList<>();
-            for (Episode newEpisode : newEpisodes) {
-                Episode lookup = episodeDao.getEpisodeByDatePublished(newEpisode.getDatePublished());
-                newEpisode.setDuration(getDuration(newEpisode));
+            for (Item item : items) {
+                long duration = getDuration(item.getLink());
+                Episode newEpisode = new Episode(
+                        item.getYear(),
+                        item.getDescription(),
+                        item.getLink(),
+                        item.getDate(),
+                        duration
+                );
+
+                Episode lookup = episodeDao.getEpisodeByDatePublished(item.getDate());
 
                 if (lookup == null) {
                     if (!StringUtils.isEmpty(newEpisode.getLink())) {
@@ -250,10 +243,10 @@ public class EpisodeRepository {
         });
     }
 
-    private long getDuration(Episode episode) {
+    private long getDuration(String episodeLink) {
 
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(episode.getLink(), new HashMap<>());
+        retriever.setDataSource(episodeLink, new HashMap<>());
 
         return Long.parseLong(
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));

@@ -7,13 +7,11 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.personal.project.explora.utils.DateUtil;
 import com.personal.project.explora.utils.StringUtils;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
-@Entity(tableName = "episodes_table")
+@Entity(tableName = DatabaseConstants.EPISODE_TABLE_NAME)
 public class Episode {
 
     private static final String EPISODE = "Emisija";
@@ -62,18 +60,6 @@ public class Episode {
         this.lastPosition = other.lastPosition;
         this.duration = other.duration;
         this.recent = other.recent;
-    }
-
-    /**
-     * Duration should never be not set, but the only time I use this method I call setDuration a
-     * bit later on (BAD CODE I KNOW)
-     */
-    public Episode(String link, String description, LocalDate date) {
-        this(date.getYear(),
-                description,
-                link,
-                DateUtil.formatMyDate(date),
-                0L);
     }
 
     public int getId() {
@@ -210,6 +196,17 @@ public class Episode {
         //this has date
         //no lastposition
         //no downloadID
+    }
+
+    /**
+     * Takes in an episode title of the form "Emisija DD.MM.YYYY." and returns "DD.MM.YYYY."
+     * @param title Title of the form "Emisija DD.MM.YYYY."
+     * @return "DD.MM.YYYY." retrieved from title
+     */
+    public static String titleToDatePublished(String title)
+    {
+        int start = 8;
+        return title.substring(start, start + 10) + ".";
     }
 
     @Override

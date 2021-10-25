@@ -1,6 +1,5 @@
 package com.personal.project.explora.feed;
 
-import com.personal.project.explora.db.Episode;
 import com.personal.project.explora.utils.DateUtil;
 
 import org.simpleframework.xml.Element;
@@ -51,15 +50,9 @@ public class Item implements Serializable {
         return date;
     }
 
-    /*
-    Uses Episode(String link, String description, LocalDate date, LocalDate lastUpdated).
-    Title is made by the constructor, and rest of the fields are null.
-     */
-    public Episode toEpisode() {
-        return new Episode(
-                this.getLink(),
-                this.getDescription(),
-                DateUtil.parse(this.getDate()));
+    public int getYear() {
+        LocalDate date = DateUtil.parse(this.getDate());
+        return date.getYear();
     }
 
 }
