@@ -17,6 +17,7 @@ import com.personal.project.explora.feed.FeedAPI;
 import com.personal.project.explora.feed.Item;
 import com.personal.project.explora.feed.Rss;
 import com.personal.project.explora.service.download.DownloadUtil;
+import com.personal.project.explora.utils.DateUtil;
 import com.personal.project.explora.utils.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -213,7 +214,7 @@ public class EpisodeRepository {
                         item.getYear(),
                         item.getDescription(),
                         item.getLink(),
-                        item.getDate(),
+                        DateUtil.formatMyDate(DateUtil.parse(item.getDate())),
                         duration
                 );
 
