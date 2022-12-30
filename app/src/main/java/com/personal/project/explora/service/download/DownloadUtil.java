@@ -23,6 +23,7 @@ import java.util.List;
 public class DownloadUtil {
 
     private static final String TAG = "DownloadUtil";
+    private static final int STOP_REASON = 1;
 
     public static void setRealDownloadsState(Application app) {
         AppExecutors appExecutors = ((BasicApp) app).getAppExecutors();
@@ -69,12 +70,36 @@ public class DownloadUtil {
         DownloadRequest downloadRequest =
                 new DownloadRequest.Builder(contentId, contentUri).build();
 
+        DownloadService.sendSetStopReason(
+                context,
+                DemoDownloadService.class,
+                contentId,
+                Download.STOP_REASON_NONE,
+                false
+        );
+
         DownloadService.sendAddDownload(
                 context,
                 DemoDownloadService.class,
                 downloadRequest,
                 false
         );
+    }
+
+    /**
+     * This guy automatically updates episode state in the db
+     */
+    public static void stopDownload(Episode episode, Context context) {
+
+        String contentId = String.valueOf(episode.getId());
+        
+        DownloadService.sendSetStopReason(
+                context,
+                DemoDownloadService.class,
+                contentId,
+                STOP_REASON,
+                false
+                );
     }
 
     /**
@@ -91,14 +116,5 @@ public class DownloadUtil {
                 false
         );
     }
-
-    /*public static void removeAllDownloads(Context context) {
-
-        DownloadService.sendRemoveAllDownloads(
-                context,
-                DemoDownloadService.class,
-                false
-        );
-    }*/
 
 }

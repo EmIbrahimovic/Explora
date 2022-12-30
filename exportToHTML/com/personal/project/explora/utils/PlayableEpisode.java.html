@@ -1,0 +1,120 @@
+<html>
+<head>
+<title>PlayableEpisode.java</title>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #067d17;}
+.s3 { color: #1750eb;}
+.s4 { color: #8c8c8c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table BGCOLOR="#c0c0c0" CELLPADDING=5 CELLSPACING=0 COLS=1 WIDTH="100%" >
+<tr><td><center>
+<font color="#000000" face="Arial, Helvetica">
+PlayableEpisode.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.personal.project.explora.utils;</span>
+
+<span class="s0">import </span><span class="s1">android.os.Bundle;</span>
+
+<span class="s0">import </span><span class="s1">androidx.annotation.NonNull;</span>
+<span class="s0">import </span><span class="s1">androidx.recyclerview.widget.DiffUtil;</span>
+
+<span class="s0">import </span><span class="s1">com.personal.project.explora.R;</span>
+<span class="s0">import </span><span class="s1">com.personal.project.explora.db.Episode;</span>
+
+<span class="s0">import </span><span class="s1">java.util.Objects;</span>
+
+<span class="s0">public class </span><span class="s1">PlayableEpisode </span><span class="s0">extends </span><span class="s1">Episode {</span>
+
+    <span class="s0">public static final int </span><span class="s1">RES_PLAY = R.drawable.ic_play;</span>
+    <span class="s0">public static final int </span><span class="s1">RES_PAUSE = R.drawable.ic_pause;</span>
+    <span class="s0">public static </span><span class="s1">String PLAYBACK_RES_CHANGED = </span><span class="s2">&quot;PLAYBACK_RES_CHANGED&quot;</span><span class="s1">;</span>
+    <span class="s0">public static </span><span class="s1">String LAST_POSITION_CHANGED = </span><span class="s2">&quot;LAST_POSITION_CHANGED&quot;</span><span class="s1">;</span>
+    <span class="s0">public static </span><span class="s1">String DESCRIPTION_CHANGED = </span><span class="s2">&quot;DESCRIPTION_CHANGED&quot;</span><span class="s1">;</span>
+    <span class="s0">public static </span><span class="s1">String NON_PLAYABLE_CHANGED = </span><span class="s2">&quot;NON_PLAYABLE_CHANGED&quot;</span><span class="s1">;</span>
+    <span class="s0">public static </span><span class="s1">String DOWNLOAD_STATE_CHANGED = </span><span class="s2">&quot;DOWNLOAD_STATE_CHANGED&quot;</span><span class="s1">;</span>
+
+    <span class="s0">public static  </span><span class="s1">DiffUtil.ItemCallback&lt;PlayableEpisode&gt; DIFF_CALLBACK =</span>
+            <span class="s0">new </span><span class="s1">DiffUtil.ItemCallback&lt;PlayableEpisode&gt; () {</span>
+
+                <span class="s1">@Override</span>
+                <span class="s0">public boolean </span><span class="s1">areItemsTheSame(@NonNull PlayableEpisode oldItem, @NonNull PlayableEpisode newItem) {</span>
+                    <span class="s0">return </span><span class="s1">oldItem.getId() == newItem.getId();</span>
+                <span class="s1">}</span>
+
+                <span class="s1">@Override</span>
+                <span class="s0">public boolean </span><span class="s1">areContentsTheSame(@NonNull PlayableEpisode oldItem, @NonNull PlayableEpisode newItem) {</span>
+                    <span class="s0">return </span><span class="s1">(Objects.equals(oldItem.getDatePublished(), newItem.getDatePublished()) &amp;&amp;</span>
+                            <span class="s1">Objects.equals(oldItem.getDescription(), newItem.getDescription()) &amp;&amp;</span>
+                            <span class="s1">oldItem.getLastPosition() == newItem.getLastPosition() &amp;&amp;</span>
+                            <span class="s1">oldItem.getDownloadState() == newItem.getDownloadState() &amp;&amp;</span>
+                            <span class="s1">oldItem.isNonPlayable() == newItem.isNonPlayable() &amp;&amp;</span>
+                            <span class="s1">oldItem.playbackRes == newItem.playbackRes);</span>
+                <span class="s1">}</span>
+
+                <span class="s1">@Override</span>
+                <span class="s0">public </span><span class="s1">Object getChangePayload(@NonNull PlayableEpisode oldItem, @NonNull PlayableEpisode newItem) {</span>
+                    <span class="s1">Bundle payload = </span><span class="s0">new </span><span class="s1">Bundle();</span>
+                    <span class="s0">if </span><span class="s1">(!Objects.equals(oldItem.getDescription(), newItem.getDescription())) {</span>
+                        <span class="s1">payload.putInt(DESCRIPTION_CHANGED, </span><span class="s3">1</span><span class="s1">);</span>
+                    <span class="s1">}</span>
+                    <span class="s0">if </span><span class="s1">(oldItem.playbackRes != newItem.playbackRes) {</span>
+                        <span class="s1">payload.putInt(PLAYBACK_RES_CHANGED, </span><span class="s3">1</span><span class="s1">);</span>
+                    <span class="s1">}</span>
+                    <span class="s0">if </span><span class="s1">(oldItem.getLastPosition() != newItem.getLastPosition()) {</span>
+                        <span class="s1">payload.putInt(LAST_POSITION_CHANGED, </span><span class="s3">1</span><span class="s1">);</span>
+                    <span class="s1">}</span>
+                    <span class="s0">if </span><span class="s1">(oldItem.isNonPlayable() != newItem.isNonPlayable()) {</span>
+                        <span class="s1">payload.putInt(NON_PLAYABLE_CHANGED, </span><span class="s3">1</span><span class="s1">);</span>
+                    <span class="s1">}</span>
+                    <span class="s0">if </span><span class="s1">(oldItem.getDownloadState() != newItem.getDownloadState()) {</span>
+                        <span class="s1">payload.putInt(DOWNLOAD_STATE_CHANGED, </span><span class="s3">1</span><span class="s1">);</span>
+                    <span class="s1">}</span>
+
+                    <span class="s0">return </span><span class="s1">payload;</span>
+                <span class="s1">}</span>
+            <span class="s1">};</span>
+
+    <span class="s0">private int </span><span class="s1">playbackRes;</span>
+    <span class="s0">private boolean </span><span class="s1">nonPlayable;</span>
+
+    <span class="s4">/* 
+     * DIFF UTIL 
+     */</span>
+
+    <span class="s0">public </span><span class="s1">PlayableEpisode(Episode episode) {</span>
+        <span class="s0">super</span><span class="s1">(episode);</span>
+        <span class="s0">this</span><span class="s1">.playbackRes = RES_PLAY;</span>
+        <span class="s0">this</span><span class="s1">.nonPlayable = </span><span class="s0">false</span><span class="s1">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public int </span><span class="s1">getPlaybackRes() {</span>
+        <span class="s0">return </span><span class="s1">playbackRes;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setPlaybackRes(</span><span class="s0">int </span><span class="s1">playbackRes) {</span>
+        <span class="s0">if </span><span class="s1">(isValidPlaybackRes(playbackRes))</span>
+            <span class="s0">this</span><span class="s1">.playbackRes = playbackRes;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setNonPlayable(</span><span class="s0">boolean </span><span class="s1">nonPlayable) {</span>
+            <span class="s0">if </span><span class="s1">(!(</span><span class="s0">this</span><span class="s1">.getDownloadState() == DOWNLOADED &amp;&amp; nonPlayable))</span>
+            <span class="s0">this</span><span class="s1">.nonPlayable = nonPlayable;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public boolean </span><span class="s1">isNonPlayable() {</span>
+        <span class="s0">return </span><span class="s1">nonPlayable;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">private boolean </span><span class="s1">isValidPlaybackRes(</span><span class="s0">int </span><span class="s1">playbackRes) {</span>
+        <span class="s0">return </span><span class="s1">playbackRes == RES_PLAY || playbackRes == RES_PAUSE;</span>
+    <span class="s1">}</span>
+
+<span class="s1">}</span>
+</pre>
+</body>
+</html>

@@ -55,7 +55,7 @@ public class BasicApp extends Application {
         if(AppStartUtil.checkAppStart(this, sharedPreferences) == AppStartUtil.AppStart.NORMAL)
             return EpisodeDatabase.getInstance(this);
 
-        return EpisodeDatabase.getInstanceFromAsset(this);
+        return EpisodeDatabase.getInstance(this);
     }
 
     public EpisodeRepository getRepository() {

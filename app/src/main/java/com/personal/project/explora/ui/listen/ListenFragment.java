@@ -23,8 +23,6 @@ import com.personal.project.explora.databinding.FragmentListenBinding;
 import com.personal.project.explora.ui.episode_list.EpisodeListViewModel;
 import com.personal.project.explora.utils.Event;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class ListenFragment extends Fragment {
@@ -81,14 +79,13 @@ public class ListenFragment extends Fragment {
     {
         years.observe(getViewLifecycleOwner(), yearsList -> {
             if (yearsList == null || yearsList.isEmpty()) {
-                // TODO
-                Toast.makeText(getActivity(), "Doživio sam ERROR", Toast.LENGTH_SHORT).show();
-
                 mBinding.setIsLoading(true);
-                Log.e(TAG, "onViewCreated: getYears().observe() - yearsList is empty");
+                Log.d(TAG, "subscribeToYearListChanges: getYears().observe() yearsList is empty");
 
                 return;
             }
+
+            Log.d(TAG, "subscribeToYearListChanges: Received valid yearsList");
 
             mBinding.setIsLoading(false);
 
