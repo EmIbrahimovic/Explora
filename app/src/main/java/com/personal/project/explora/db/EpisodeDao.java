@@ -21,14 +21,20 @@ public interface EpisodeDao {
     @Delete
     void delete(Episode episode);
 
+    @Query("select * from episodes_table")
+    List<Episode> getEpisodesSync();
+
+    @Query("select distinct year from episodes_table order by year desc")
+    LiveData<List<Integer>> getYears();
+
     @Query("select * from episodes_table where year = :requestedYear order by id desc")
     LiveData<List<Episode>> getEpisodesFromYear(int requestedYear);
 
     @Query("select * from episodes_table where id = :episode_id")
     Episode getEpisodeSync(int episode_id);
 
-    @Query("select * from episodes_table where title = :title")
-    Episode getEpisodeByTitle(String title);
+    @Query("select * from episodes_table where datePublished = :datePublished")
+    Episode getEpisodeByDatePublished(String datePublished);
 
     @Query("select * from episodes_table where recent IS NOT NULL")
     LiveData<List<Episode>> getRecentEpisodes();

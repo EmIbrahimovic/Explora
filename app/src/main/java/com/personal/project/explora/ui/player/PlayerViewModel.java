@@ -1,5 +1,8 @@
 package com.personal.project.explora.ui.player;
 
+import static com.personal.project.explora.service.PlayerServiceConnection.EMPTY_PLAYBACK_STATE;
+import static com.personal.project.explora.service.PlayerServiceConnection.NOTHING_PLAYING;
+
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,16 +21,13 @@ import com.personal.project.explora.R;
 import com.personal.project.explora.service.PlayerServiceConnection;
 import com.personal.project.explora.utils.StringUtils;
 
-import static com.personal.project.explora.service.PlayerServiceConnection.EMPTY_PLAYBACK_STATE;
-import static com.personal.project.explora.service.PlayerServiceConnection.NOTHING_PLAYING;
-
 public class PlayerViewModel extends AndroidViewModel {
 
     private static final long POSITION_UPDATE_INTERVAL_MILLIS = 100L;
 
-    public static final int RES_PLAY_ARROW = R.drawable.exo_controls_play;
-    public static final int RES_PAUSE_LINES = R.drawable.exo_controls_pause;
-    public static final int RES_REPLAY = R.drawable.ic_replay_32;
+    public static final int RES_PLAY_ARROW = R.drawable.ic_play_big;
+    public static final int RES_PAUSE_LINES = R.drawable.ic_pause_big;
+    public static final int RES_REPLAY = R.drawable.ic_replay;
 
     private final Handler handler;
 

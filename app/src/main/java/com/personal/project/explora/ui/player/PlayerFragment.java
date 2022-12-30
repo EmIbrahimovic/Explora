@@ -9,6 +9,7 @@ import android.widget.SeekBar;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -40,7 +41,7 @@ public class PlayerFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 mMainActivityViewModel.onBackPressed();
@@ -59,8 +60,8 @@ public class PlayerFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mPlayerViewModel = new ViewModelProvider(this).get(PlayerViewModel.class);
         mMainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
@@ -110,11 +111,9 @@ public class PlayerFragment extends Fragment {
             }
         });
 
-        mBinding.playerFragmentToolbar.setNavigationIcon(R.drawable.ic_back_arrow);
-        mBinding.playerFragmentToolbar.setNavigationOnClickListener(
-                v -> mMainActivityViewModel.onBackPressed());
+        mBinding.backArrow.setOnClickListener(v -> mMainActivityViewModel.onBackPressed());
 
-        mBinding.playerFragmentToolbar.setTitle(R.string.loading);
+        mBinding.title.setText(R.string.loading);
         mBinding.duration.setText(StringUtils.timestampToMSS(0L));
         mBinding.position.setText(StringUtils.timestampToMSS(0L));
 
@@ -135,6 +134,20 @@ public class PlayerFragment extends Fragment {
             mBinding.position.setText(StringUtils.timestampToMSS(pos));
             mBinding.seekBar.setProgress(Math.toIntExact(pos));
         });
+
+        mMainActivityViewModel.getNetworkAvailability().observe(getViewLifecycleOwner(), available -> {
+            if (available == null) return;
+            if (available) {
+                mBinding.onlineStatus.setBackground(
+                        AppCompatResources.getDrawable(requireActivity(), R.drawable.online_bubble));
+                mBinding.onlineStatus.setText(getString(R.string.online));
+            }
+            else {
+                mBinding.onlineStatus.setBackground(
+                        AppCompatResources.getDrawable(requireActivity(), R.drawable.offline_bubble));
+                mBinding.onlineStatus.setText(getString(R.string.offline));
+            }
+        });
     }
 
     private void updateUI(PlayerViewModel.NowPlayingMetadata metadata) {
@@ -145,7 +158,7 @@ public class PlayerFragment extends Fragment {
                 .centerInside()
                 .into(mBinding.albumArt);
 
-        mBinding.playerFragmentToolbar.setTitle(metadata.title);
+        mBinding.title.setText(metadata.title);
         mBinding.duration.setText(metadata.duration);
         mBinding.seekBar.setMax((int) metadata.durationMs);
     }

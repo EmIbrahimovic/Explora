@@ -1,5 +1,7 @@
 package com.personal.project.explora.ui.episode_list;
 
+import static android.content.Intent.ACTION_SEND;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,25 +18,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.personal.project.explora.BasicApp;
 import com.personal.project.explora.R;
 import com.personal.project.explora.databinding.FragmentEpisodeListBinding;
 import com.personal.project.explora.db.Episode;
 import com.personal.project.explora.ui.MainActivityViewModel;
 import com.personal.project.explora.utils.PlayableEpisode;
+import com.personal.project.explora.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.content.Intent.ACTION_SEND;
 
 public abstract class EpisodeListFragment extends Fragment implements EpisodeAdapter.EpisodeClickedListener,
         SwipeRefreshLayout.OnRefreshListener {
 
     protected EpisodeListViewModel mViewModel;
-    protected FragmentEpisodeListBinding mBinding;
     private MainActivityViewModel mMainActivityViewModel;
+
+    protected FragmentEpisodeListBinding mBinding;
+
     private RecyclerView mRecyclerView;
     private EpisodeAdapter mAdapter;
+
     private LiveData<List<Episode>> mEpisodes;
 
     protected EpisodeListFragment() { }
@@ -58,8 +63,8 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mViewModel = new ViewModelProvider(requireActivity()).get(EpisodeListViewModel.class);
         mMainActivityViewModel = new ViewModelProvider(requireActivity()).get(MainActivityViewModel.class);
@@ -76,11 +81,24 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
     private void subscribeUi() {
         subscribeUiToEpisodeList(mEpisodes);
         subscribeUiToWhatIsPlaying(mViewModel.getNowPlayingId(), mViewModel.getIsPlaying());
+        subscribeUiToNetworkChange();
+    }
+
+    private void subscribeUiToNetworkChange() {
+        mMainActivityViewModel.getNetworkAvailability().observe(getViewLifecycleOwner(), available -> {
+            if (available == null) return;
+            mAdapter.submitList(
+                    makePlayableEpisodesList(
+                            mEpisodes.getValue(),
+                            mViewModel.getNowPlayingId().getValue(),
+                            mViewModel.getIsPlaying().getValue()
+                    )
+            );
+        });
     }
 
     private void subscribeUiToEpisodeList(LiveData<List<Episode>> myEpisodes) {
         myEpisodes.observe(getViewLifecycleOwner(), episodes -> {
-
             if (episodes != null) {
 
                 mBinding.setIsLoading(false);
@@ -110,8 +128,6 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
 
             mBinding.executePendingBindings();
         });
-
-
     }
 
     private void subscribeUiToWhatIsPlaying(LiveData<Integer> nowPlaying, LiveData<Boolean> isPlaying) {
@@ -141,13 +157,16 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
                                                            Boolean isPlaying) {
 
         List<PlayableEpisode> playableEpisodes = new ArrayList<>();
+
         if (episodes != null) {
             for (Episode episode : episodes) {
                 PlayableEpisode ep = new PlayableEpisode(episode);
                 if (nowPlayingId != null && isPlaying != null &&
                         episode.getId() == nowPlayingId && isPlaying) {
-                    ep.setPlaybackRes(R.drawable.exo_controls_pause);
+                    ep.setPlaybackRes(PlayableEpisode.RES_PAUSE);
                 }
+                ep.setNonPlayable(StringUtils.isEmpty(episode.getUri().toString()) ||
+                        !((BasicApp) requireActivity().getApplication()).isOnline());
 
                 playableEpisodes.add(ep);
             }
@@ -173,8 +192,10 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
     public void onDownloadEpisodeClicked(Episode episode) {
         if (episode.getDownloadState() == Episode.NOT_DOWNLOADED) {
             mViewModel.download(episode);
-        } else {
+        } else if (episode.getDownloadState() == Episode.DOWNLOADED) {
             mViewModel.removeDownload(episode);
+        } else {
+            mViewModel.stopDownload(episode);
         }
     }
 
@@ -195,7 +216,7 @@ public abstract class EpisodeListFragment extends Fragment implements EpisodeAda
 
     private Intent makeShareIntent(Episode episode) {
         Intent sendIntent = new Intent(ACTION_SEND);
-        String text = "Poslušajte emisiju Explore: " + episode.getTitle() + " " + episode.getLink();
+        String text = getString(R.string.share_text) + ": " + episode.getTitle() + " " + episode.getShareLink();
 
         sendIntent.putExtra(Intent.EXTRA_TEXT, text);
         sendIntent.setType("text/plain");

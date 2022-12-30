@@ -1,5 +1,8 @@
 package com.personal.project.explora.service;
 
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID;
+import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PREPARE_FROM_MEDIA_ID;
+
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -20,11 +23,10 @@ import androidx.core.content.ContextCompat;
 import androidx.media.MediaBrowserServiceCompat;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.ControlDispatcher;
-import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.MediaMetadata;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.audio.AudioAttributes;
@@ -34,14 +36,12 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager;
 import com.personal.project.explora.AppExecutors;
 import com.personal.project.explora.BasicApp;
 import com.personal.project.explora.EpisodeRepository;
+import com.personal.project.explora.R;
 import com.personal.project.explora.db.Episode;
 import com.personal.project.explora.service.download.DemoUtil;
 import com.personal.project.explora.utils.YearsData;
 
 import java.util.List;
-
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID;
-import static android.support.v4.media.session.PlaybackStateCompat.ACTION_PREPARE_FROM_MEDIA_ID;
 
 public class PlayerService extends MediaBrowserServiceCompat
         implements EpisodeRepository.EpisodeRetrievedListenerForPrepare {
@@ -51,7 +51,7 @@ public class PlayerService extends MediaBrowserServiceCompat
     private static final String TAG = "PlayerService";
     private static final String MY_EMPTY_MEDIA_ROOT_ID = "empty_root_id";
     private final AudioAttributes mAudioAttributes = new AudioAttributes.Builder()
-            .setContentType(C.CONTENT_TYPE_SPEECH)
+            .setContentType(C.AUDIO_CONTENT_TYPE_SPEECH)
             .setUsage(C.USAGE_MEDIA)
             .build();
     private ExploraPlayerNotificationManager notificationManager;
@@ -79,7 +79,7 @@ public class PlayerService extends MediaBrowserServiceCompat
 
         Intent sessionIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
         PendingIntent sessionActivityPendingIntent =
-                PendingIntent.getActivity(this, 0, sessionIntent, 0);
+                PendingIntent.getActivity(this, 0, sessionIntent, PendingIntent.FLAG_IMMUTABLE);
 
         initializePlayer();
 
@@ -155,6 +155,8 @@ public class PlayerService extends MediaBrowserServiceCompat
             mExoPlayer = new SimpleExoPlayer.Builder(this)
                     .setMediaSourceFactory(new DefaultMediaSourceFactory(
                             DemoUtil.getDataSourceFactory(this, mExecutors.networkIO())))
+                    .setSeekBackIncrementMs(15000)
+                    .setSeekForwardIncrementMs(15000)
                     .build();
             mExoPlayer.setAudioAttributes(mAudioAttributes, true);
             mExoPlayer.addListener(mPlaybackStateListener);
@@ -182,7 +184,8 @@ public class PlayerService extends MediaBrowserServiceCompat
                 .build();
 
         mExoPlayer.setPlayWhenReady(playWhenReady);
-        mExoPlayer.stop(true);
+        mExoPlayer.stop();
+        mExoPlayer.clearMediaItems();
         mExoPlayer.setMediaItem(mediaItem, playbackStartPositionMs);
         mExoPlayer.prepare();
         mMediaSession.setMetadata(itemToPlay);
@@ -200,7 +203,7 @@ public class PlayerService extends MediaBrowserServiceCompat
             return;
         }
 
-        int yearRes = YearsData.getYearImageRes(currentlyPlaying.getYear());
+        int yearRes = YearsData.getYearImageRes();
         MediaMetadataCompat item = new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, String.valueOf(currentlyPlaying.getId()))
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentlyPlaying.getTitle())
@@ -256,10 +259,19 @@ public class PlayerService extends MediaBrowserServiceCompat
         }
     }
 
-    private class PlaybackStateListener implements Player.EventListener {
+    private class PlaybackStateListener implements Player.Listener {
 
         @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        public void onPlayWhenReadyChanged(boolean playWhenReady, int reason) {
+            saveLastPosition();
+
+            if (!playWhenReady) {
+                stopForeground(false);
+            }
+        }
+
+        @Override
+        public void onPlaybackStateChanged(int playbackState) {
 
             if (playbackState == ExoPlayer.STATE_BUFFERING ||
                     playbackState == ExoPlayer.STATE_READY) {
@@ -267,20 +279,20 @@ public class PlayerService extends MediaBrowserServiceCompat
                 notificationManager.showNotificationForPlayer(mExoPlayer);
 
                 if (playbackState == ExoPlayer.STATE_READY) {
-
                     saveLastPosition();
-
-                    if (!playWhenReady) {
-                        stopForeground(false);
-                    }
                 }
             } else {
                 notificationManager.hideNotification();
             }
-
         }
 
         @Override
+        public void onPlayerError(PlaybackException error) {
+
+            Toast.makeText(PlayerService.this, R.string.an_error_occurred, Toast.LENGTH_LONG).show();
+        }
+
+        /*@Override
         public void onPlayerError(ExoPlaybackException error) {
 
             String message = "An unexpected error occurred.";
@@ -303,7 +315,7 @@ public class PlayerService extends MediaBrowserServiceCompat
             }
 
             Toast.makeText(PlayerService.this, message, Toast.LENGTH_LONG).show();
-        }
+        }*/
     }
 
     private class MyPlaybackPreparer implements MediaSessionConnector.PlaybackPreparer {
@@ -329,10 +341,9 @@ public class PlayerService extends MediaBrowserServiceCompat
         public void onPrepareFromUri(Uri uri, boolean playWhenReady, @Nullable Bundle extras) { }
 
         @Override
-        public boolean onCommand(Player player, ControlDispatcher controlDispatcher, String command, @Nullable Bundle extras, @Nullable ResultReceiver cb) {
+        public boolean onCommand(Player player, String command, @Nullable Bundle extras, @Nullable ResultReceiver cb) {
             return false;
         }
-
     }
 
 }

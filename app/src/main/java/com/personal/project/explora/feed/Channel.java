@@ -1,6 +1,5 @@
 package com.personal.project.explora.feed;
 
-import com.personal.project.explora.db.Episode;
 import com.personal.project.explora.utils.DateUtil;
 
 import org.simpleframework.xml.Element;
@@ -42,25 +41,6 @@ public class Channel implements Serializable {
 
     public List<Item> getItems() {
         return items;
-    }
-
-    /**
-     * The returned episodes will be of format:
-     * Episode(id=0, year, title, description(may be null), lenght=null, link, image=null, lastUpd)
-     * @return list of retrieved episodes
-     */
-    public List<Episode> getEpisodes() {
-        return convertItemsToEpisodes(this.getItems());
-    }
-
-    private List<Episode> convertItemsToEpisodes(List<Item> items) {
-
-        List<Episode> episodes = new ArrayList<>();
-        for (Item item : items) {
-            episodes.add(item.toEpisode(getLastBuildLocalDate()));
-        }
-
-        return episodes;
     }
 
 }
