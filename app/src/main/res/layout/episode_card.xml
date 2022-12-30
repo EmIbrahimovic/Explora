@@ -9,7 +9,8 @@
     android:layout_marginVertical="8dp"
     app:cardCornerRadius="16dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
@@ -17,70 +18,129 @@
         android:paddingHorizontal="24dp"
         android:paddingVertical="12dp">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/title_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium_element_margin"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:gravity="center_vertical"
-            android:layout_marginVertical="8dp"
             android:orientation="horizontal">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/episode_image"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="start"
+                android:contentDescription="@string/album_art"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize5Percent"
+                tools:srcCompat="@drawable/pic_2022" />
 
             <TextView
                 android:id="@+id/episode_title"
                 style="@style/EpisodeTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/wide_element_margin"
+                android:text="@string/episode_title"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/episode_image"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/episode_description"
+            style="@style/EpisodeTextDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/wide_element_margin"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_layout"
+            tools:text="@string/episode_desctipion" />
+
+        <LinearLayout
+            android:id="@+id/share_download_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/medium_element_margin"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/episode_description">
+
+            <Button
+                android:id="@+id/episode_download_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/episode_title"/>
+                style="@style/ButtonLabel"
+                android:layout_gravity="center"
+                android:background="?android:attr/selectableItemBackground"
+                android:contentDescription="@string/download_button"
+                android:drawableStart="@drawable/ic_download_vec"
+                android:drawablePadding="@dimen/small_element_margin"
+                android:text="@string/download" />
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <ImageButton
-                android:id="@+id/episode_menu_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+            <Button
+                android:id="@+id/episode_share_button"
+                style="@style/ButtonLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:contentDescription="@string/share_button"
+                android:drawableStart="@drawable/ic_share"
+                android:drawablePadding="@dimen/small_element_margin"
                 android:background="?android:attr/selectableItemBackground"
-                android:src="@drawable/ic_more"
-                android:contentDescription="@string/options_button" />
+                android:text="@string/share_button_text"/>
+
         </LinearLayout>
-
-        <ImageView
-            android:id="@+id/episode_image"
-            android:layout_width="wrap_content"
-            android:layout_height="128dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginVertical="@dimen/margin_thing"
-            tools:srcCompat="@tools:sample/avatars"
-            android:contentDescription="@string/album_art" />
-
-        <TextView
-            style="@style/EpisodeTextDescription"
-            android:id="@+id/episode_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            tools:text="@string/episode_desctipion"/>
 
         <LinearLayout
             android:id="@+id/bottom_card_things"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/margin_thing"
+            android:layout_marginTop="@dimen/medium_element_margin"
+            android:layout_marginBottom="@dimen/wide_element_margin"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/share_download_layout">
+
+            <TextView
+                android:id="@+id/non_playable_text"
+                style="@style/NonPlayableText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/medium_element_margin"
+                android:text="@string/non_playable_text"
+                android:visibility="gone" />
 
             <ImageButton
                 android:id="@+id/episode_play_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/circle_button_dimen"
+                android:layout_height="@dimen/circle_button_dimen"
                 android:background="@drawable/circle_button"
+                android:contentDescription="@string/play_pause_button"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/episode_description"
-                app:srcCompat="@drawable/exo_icon_play"
-                android:contentDescription="@string/play_pause_button" />
+                app:srcCompat="@drawable/ic_play" />
 
             <TextView
                 android:id="@+id/episode_last_position"
@@ -96,19 +156,20 @@
                 android:layout_weight="1" />
 
             <ImageButton
-                android:id="@+id/episode_share_button"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:id="@+id/episode_mark_completed_button"
+                android:layout_width="@dimen/circle_button_dimen"
+                android:layout_height="@dimen/circle_button_dimen"
                 android:background="?android:attr/selectableItemBackground"
+                android:contentDescription="@string/mark_as_completed_button"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/episode_description"
-                app:srcCompat="@drawable/ic_share"
-                android:contentDescription="@string/share_button" />
+                app:srcCompat="@drawable/ic_mark_completed"
+                app:tint="@color/completed_button_color" />
         </LinearLayout>
 
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.cardview.widget.CardView>

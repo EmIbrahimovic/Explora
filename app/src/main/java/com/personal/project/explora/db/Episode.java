@@ -2,7 +2,6 @@ package com.personal.project.explora.db;
 
 import android.net.Uri;
 
-import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -23,27 +22,31 @@ public class Episode {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private int year;
+    private final int year;
     private String description;
     private String link;
-    private String datePublished;
-
+    private final String datePublished;
+    private final long duration;
+    private String shareLink;
+    private long lastPosition;
+//    private boolean nonPlayable;
     @ColumnInfo(name = "downloadId")
     private int downloadState;
-    private long lastPosition;
-    private long duration;
     private String recent;
 
     public Episode(int year,
                    String description,
                    String link,
+                   String shareLink,
                    String datePublished,
                    long duration) {
 
         this.year = year;
         this.description = description;
         this.link = link;
+        this.shareLink = shareLink;
         this.datePublished = datePublished;
+//        this.nonPlayable = false;
         this.downloadState = NOT_DOWNLOADED;
         this.lastPosition = 0L;
         this.duration = duration;
@@ -55,7 +58,9 @@ public class Episode {
         this.year = other.year;
         this.description = other.description;
         this.link = other.link;
+        this.shareLink = other.shareLink;
         this.datePublished = other.datePublished;
+//        this.nonPlayable = other.nonPlayable;
         this.downloadState = other.downloadState;
         this.lastPosition = other.lastPosition;
         this.duration = other.duration;
@@ -86,7 +91,20 @@ public class Episode {
         return link;
     }
 
+    public String getShareLink() {
+        return shareLink;
+    }
+
     public String getDatePublished() { return datePublished; }
+
+//    public boolean isNonPlayable() {
+//        return nonPlayable;
+//    }
+//
+//    public void setNonPlayable(boolean nonPlayable) {
+//        if (!(nonPlayable && this.downloadState == DOWNLOADED))
+//            this.nonPlayable = nonPlayable;
+//    }
 
     public static boolean isValidDownloadId(int downloadId) {
         return downloadId == DOWNLOADED || downloadId == NOT_DOWNLOADED || downloadId == DOWNLOADING;
@@ -124,9 +142,9 @@ public class Episode {
         return duration;
     }
 
-    public void setDuration(long duration) {
+    /*public void setDuration(long duration) {
         this.duration = duration;
-    }
+    }*/
 
     public String getRecent() {
         return recent;
@@ -152,14 +170,19 @@ public class Episode {
         if (!this.datePublished.equals(other.datePublished))
             return false;
         
-        boolean ret = false;
-        if (StringUtils.isEmpty(other.description) &&
-                !StringUtils.isEmpty(this.description))
-            ret = true;
+        boolean ret = StringUtils.isEmpty(other.description) &&
+                !StringUtils.isEmpty(this.description);
 
         if (StringUtils.isEmpty(other.link) &&
                 !StringUtils.isEmpty(this.link))
             ret = true;
+
+        if (StringUtils.isEmpty(other.shareLink) &&
+                !StringUtils.isEmpty(this.shareLink))
+            ret = true;
+
+//        if (this.nonPlayable != other.nonPlayable)
+//            ret = true;
         
         return ret;
     }
@@ -168,11 +191,11 @@ public class Episode {
      Checks if episode has all non-empty important fields.
      */
     public boolean areContentsComplete() {
-        boolean ret = true;
-        if (id <= 0) ret = false;
+        boolean ret = id > 0;
         if (StringUtils.isEmpty(datePublished)) ret = false;
         if (StringUtils.isEmpty(description)) ret = false;
         if (StringUtils.isEmpty(link)) ret = false;
+        if (StringUtils.isEmpty(shareLink)) ret = false;
         
         return ret;
     }
@@ -185,6 +208,8 @@ public class Episode {
      */
     public void completeContentWith(Episode other) {
 
+        // TODO de ga popravi
+
         if (!other.completes(this))
             return;
 
@@ -193,6 +218,8 @@ public class Episode {
         //this has title
         if (!StringUtils.isEmpty(other.description)) this.description = other.description;
         if (!StringUtils.isEmpty(other.link)) this.link = other.link;
+        if (!StringUtils.isEmpty(other.shareLink)) this.shareLink = other.shareLink;
+//        this.setNonPlayable(other.nonPlayable);
         //this has date
         //no lastposition
         //no downloadID
@@ -216,30 +243,37 @@ public class Episode {
         Episode episode = (Episode) o;
         return id == episode.id &&
                 year == episode.year &&
-                Objects.equals(description, episode.description) &&
-                Objects.equals(link, episode.link) &&
-                Objects.equals(datePublished, episode.datePublished) &&
+//                nonPlayable == episode.nonPlayable &&
                 downloadState == episode.downloadState &&
                 lastPosition == episode.lastPosition &&
                 duration == episode.duration &&
+                Objects.equals(description, episode.description) &&
+                Objects.equals(link, episode.link) &&
+                Objects.equals(shareLink, episode.shareLink) &&
+                datePublished.equals(episode.datePublished) &&
                 Objects.equals(recent, episode.recent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, year, description, link, datePublished, downloadState,
-                lastPosition, duration, recent);
+        return Objects.hash(id, year, description, link, shareLink, datePublished,
+                /*nonPlayable,*/ downloadState, lastPosition, duration, recent);
     }
 
-    @NonNull
     @Override
     public String toString() {
-        return "[ ID: " + id + "; " +
-                "Date Published: " + datePublished + "; " +
-                "DownloadId: " + downloadState + "; " +
-                "LastPosition: " + lastPosition + "; " +
-                "Duration: " + duration + "; " +
-                "Recent: " + recent + " ]";
+        return "Episode{" +
+                "id=" + id +
+                ", year=" + year +
+                ", link='" + link + '\'' +
+                ", shareLink='" + shareLink + '\'' +
+                ", datePublished='" + datePublished + '\'' +
+                /*", nonplayable=" + nonPlayable +*/
+                ", downloadState=" + downloadState +
+                ", lastPosition=" + lastPosition +
+                ", duration=" + duration +
+                ", recent='" + recent + '\'' +
+                '}';
     }
 
 }

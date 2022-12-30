@@ -1,6 +1,7 @@
 package com.personal.project.explora;
 
 import android.app.Application;
+import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,7 +23,6 @@ import com.personal.project.explora.utils.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,8 +43,8 @@ public class EpisodeRepository {
     private final EpisodeDao episodeDao;
     private final FeedAPI feedAPI;
 
-    private static final String BASE_URL = "https://radio.hrt.hr/";
-    private static final String FEED_URL = "https://radio.hrt.hr/podcast/rss/radio-pula/1277/explora.xml";
+    private static final String BASE_URL = "https://feed.hrt.hr/";
+    private static final String FEED_URL = "https://feed.hrt.hr/podcast/explora.xml";
 
     private final LiveData<List<Integer>> years;
 
@@ -132,6 +132,10 @@ public class EpisodeRepository {
         mExecutors.diskIO().execute(() -> episodeDao.update(episode));
     }
 
+    public void delete(final Episode episode) {
+        mExecutors.diskIO().execute(() -> episodeDao.delete(episode));
+    }
+
     /** very special use case with a probably better solution but hey */
     public void getEpisodeFromIdForPrepare(int id, EpisodeRetrievedListenerForPrepare listener,
                                            boolean playWhenReady, Bundle extras) {
@@ -149,8 +153,10 @@ public class EpisodeRepository {
 
         mExecutors.diskIO().execute(() -> {
             Episode episode = episodeDao.getEpisodeSync(id);
-            episode.setDownloadState(downloadId);
-            update(episode);
+            if (episode != null) {
+                episode.setDownloadState(downloadId);
+                update(episode);
+            }
         });
     }
 
@@ -158,6 +164,7 @@ public class EpisodeRepository {
     public void updateDownloads(List<Integer> downloadedIds) {
         mExecutors.diskIO().execute(() -> {
 
+            Log.d(TAG, "updateDownloads: updating the initial download state");
             List<Integer> currentlyDownloaded = episodeDao.getDownloadedEpisodesIdSync();
             for (Integer id : currentlyDownloaded) {
                 if (!downloadedIds.contains(id))
@@ -192,7 +199,6 @@ public class EpisodeRepository {
 
                 Channel channel = response.body().getChannel();
 
-                // updateDBWithItems posts success
                 updateDBWithItems(channel.getItems());
             }
 
@@ -207,37 +213,60 @@ public class EpisodeRepository {
     private void updateDBWithItems(List<Item> items) {
 
         mExecutors.networkIO().execute(() -> {
-            List<Episode> toInsert = new ArrayList<>();
+
+            // STEP 1: Check if all episodes currently in my database still exist in the RSS feed
+            List<Episode> currentEpisodeList = episodeDao.getEpisodesSync();
+            if (currentEpisodeList != null) {
+                for (Episode episode : currentEpisodeList) {
+                    Log.d(TAG, "updateDBWithItems: STEP 1 processing " + episode);
+                    boolean found = false;
+                    for (Item item : items) {
+                        if (DateUtil.formatMyDate(DateUtil.parse(item.getDate())).equals(
+                                episode.getDatePublished())) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                        delete(episode);
+                    else
+                        Log.d(TAG, "updateDBWithItems: STEP 1 episode found");
+                }
+            }
+
+            // STEP 2: Add episodes from the RSS feed to my database if needed
+            //         Mark episodes as unplayable if necessary
             for (Item item : items) {
-                long duration = getDuration(item.getLink());
+                Log.d(TAG, "updateDBWithItems: processing item " + item);
+
+                long duration = item.getDuration() * 1000 - 4000;
+                try {
+                    duration = getDuration(item.getLink());
+                } catch (Exception e) {
+                    Log.e(TAG, "updateDBWithItems: getDuration throws error " + e.getMessage());
+                }
+
                 Episode newEpisode = new Episode(
                         item.getYear(),
                         item.getDescription(),
                         item.getLink(),
+                        item.getShareLink(),
                         DateUtil.formatMyDate(DateUtil.parse(item.getDate())),
                         duration
                 );
 
-                Episode lookup = episodeDao.getEpisodeByDatePublished(item.getDate());
+                Episode lookup = episodeDao.getEpisodeByDatePublished(newEpisode.getDatePublished());
 
                 if (lookup == null) {
                     if (!StringUtils.isEmpty(newEpisode.getLink())) {
-                        toInsert.add(newEpisode);
+                        insert(newEpisode);
                     }
                 }
-                else if (lookup.areContentsComplete()) {
-                    break;
-                }
                 else if (newEpisode.completes(lookup)) {
-
                     lookup.completeContentWith(newEpisode);
-
                     update(lookup);
                 }
-            }
-
-            for (int i = toInsert.size() - 1; i >= 0; i--) {
-                insert(toInsert.get(i));
             }
 
             mExecutors.diskIO().execute(() -> networkOperationSucceeded.postValue(SUCCESS));
@@ -247,7 +276,7 @@ public class EpisodeRepository {
     private long getDuration(String episodeLink) {
 
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(episodeLink, new HashMap<>());
+        retriever.setDataSource(episodeLink, new HashMap<String, String>());
 
         return Long.parseLong(
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
@@ -260,4 +289,19 @@ public class EpisodeRepository {
         void onEpisodeRetrieved(Episode episode, boolean playWhenReady, Bundle extras);
     }
 
+    /*
+    DOWNLOAD OPERATIONS
+     */
+
+    public void download(Episode episode, Context applicationContext) {
+        DownloadUtil.addDownload(episode, applicationContext);
+    }
+
+    public void removeDownload(Episode episode, Context applicationContext) {
+        DownloadUtil.removeDownload(episode, applicationContext);
+    }
+
+    public void stopDownload(Episode episode, Context applicationContext) {
+        DownloadUtil.stopDownload(episode, applicationContext);
+    }
 }

@@ -13,6 +13,7 @@ public final class DatabaseConstants {
     public static final String EPISODE_YEAR_COLUMN = "year";
     public static final String EPISODE_DESCRIPTION_COLUMN = "description";
     public static final String EPISODE_LINK_COLUMN = "link";
+    public static final String EPISODE_SHARE_LINK_COLUMN = "shareLink";
     public static final String EPISODE_DATE_PUBLISHED_COLUMN = "datePublished";
     public static final String EPISODE_DOWNLOAD_ID_COLUMN = "downloadId";
     public static final String EPISODE_LAST_POSITION_COLUMN = "lastPosition";

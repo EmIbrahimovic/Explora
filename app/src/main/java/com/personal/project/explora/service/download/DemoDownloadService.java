@@ -16,6 +16,8 @@
 /* ft. some small editions and additions by me */
 package com.personal.project.explora.service.download;
 
+import static com.personal.project.explora.service.download.DemoUtil.DOWNLOAD_NOTIFICATION_CHANNEL_ID;
+
 import android.app.Application;
 import android.app.Notification;
 import android.content.Context;
@@ -38,8 +40,6 @@ import com.personal.project.explora.R;
 import com.personal.project.explora.db.Episode;
 
 import java.util.List;
-
-import static com.personal.project.explora.service.download.DemoUtil.DOWNLOAD_NOTIFICATION_CHANNEL_ID;
 
 /** A service for downloading media. */
 public class DemoDownloadService extends DownloadService {
@@ -90,15 +90,14 @@ public class DemoDownloadService extends DownloadService {
   }
 
   @Override
-  @NonNull
-  protected Notification getForegroundNotification(@NonNull List<Download> downloads) {
+  protected Notification getForegroundNotification(List<Download> downloads, int notMetRequirements) {
     return DemoUtil.getDownloadNotificationHelper(/* context= */ this)
-        .buildProgressNotification(
-            /* context= */ this,
-            R.drawable.ic_download,
-            /* contentIntent= */ null,
-            /* message= */ null,
-            downloads);
+            .buildProgressNotification(
+                    /* context= */ this,
+                    R.drawable.ic_download,
+                    /* contentIntent= */ null,
+                    /* message= */ null,
+                    downloads);
   }
 
   private static final class DownloadStateListener implements DownloadManager.Listener {

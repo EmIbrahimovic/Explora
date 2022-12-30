@@ -1,6 +1,10 @@
 package com.personal.project.explora.ui;
 
 import android.app.Application;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -20,12 +24,21 @@ import com.personal.project.explora.utils.Event;
 import com.personal.project.explora.utils.PlayableEpisode;
 import com.personal.project.explora.utils.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivityViewModel extends AndroidViewModel {
 
     private static final String TAG = "MainActivityViewModel";
 
+    public static final Boolean NETWORK_AVAILABLE = Boolean.TRUE;
+    public static final Boolean NETWORK_UNAVAILABLE = Boolean.FALSE;
+
     private final PlayerServiceConnection playerServiceConnection;
+    private final MutableLiveData<Boolean> networkAvailability;
+    private final List<String> networks;
+
     private final MutableLiveData<Event<FragmentNavigationRequest>> navigateToFragment;
     private final MutableLiveData<Event<Boolean>> backPressedEvent;
     private final MutableLiveData<Event<Boolean>> bottomNavigationVisibleEvent;
@@ -42,6 +55,9 @@ public class MainActivityViewModel extends AndroidViewModel {
         backPressedEvent = new MutableLiveData<>();
         bottomNavigationVisibleEvent = new MutableLiveData<>();
 
+        networkAvailability = new MutableLiveData<>();
+        networks = new ArrayList<>();
+
         isServiceConnected = false;
         thingToPlay = null;
 
@@ -57,6 +73,39 @@ public class MainActivityViewModel extends AndroidViewModel {
                 isServiceConnected = false;
             }
         });
+
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                .build();
+
+        ConnectivityManager connectivityManager =
+                application.getSystemService(ConnectivityManager.class);
+        ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                super.onAvailable(network);
+                if (!networks.contains(network.toString())) {
+                    networks.add(network.toString());
+                    notifyNetworkAvailable();
+                }
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                super.onLost(network);
+                networks.remove(network.toString());
+
+                if (networks.isEmpty())
+                    notifyNetworkUnavailable();
+            }
+        };
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
+    }
+
+    public LiveData<Boolean> getNetworkAvailability() {
+        return networkAvailability;
     }
 
     public LiveData<Event<FragmentNavigationRequest>> getNavigateToFragment() {
@@ -119,7 +168,6 @@ public class MainActivityViewModel extends AndroidViewModel {
                     Log.w(TAG, "Playable item clicked but neither play nor pause are enabled! " + id);
                 }
 
-                toRet = false;
             } else {
                 transportControls.playFromMediaId(String.valueOf(episode.getId()), null);
                 toRet = true;
@@ -199,6 +247,14 @@ public class MainActivityViewModel extends AndroidViewModel {
 
         }
 
+    }
+
+    private void notifyNetworkAvailable() {
+        networkAvailability.postValue(NETWORK_AVAILABLE);
+    }
+
+    private void notifyNetworkUnavailable() {
+        networkAvailability.postValue(NETWORK_UNAVAILABLE);
     }
 
     public void onBackPressed() {

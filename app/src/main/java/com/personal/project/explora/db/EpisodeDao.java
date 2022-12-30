@@ -7,7 +7,6 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -21,6 +20,9 @@ public interface EpisodeDao {
 
     @Delete
     void delete(Episode episode);
+
+    @Query("select * from episodes_table")
+    List<Episode> getEpisodesSync();
 
     @Query("select distinct year from episodes_table order by year desc")
     LiveData<List<Integer>> getYears();

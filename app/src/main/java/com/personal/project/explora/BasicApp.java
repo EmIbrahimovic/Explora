@@ -25,6 +25,7 @@ import android.preference.PreferenceManager;
 
 import com.personal.project.explora.db.EpisodeDatabase;
 import com.personal.project.explora.service.PlayerServiceConnection;
+import com.personal.project.explora.utils.AppStartUtil;
 
 /**
  * Android Application class. Used for accessing singletons.
@@ -51,8 +52,8 @@ public class BasicApp extends Application {
     }
 
     public EpisodeDatabase getDatabase() {
-        /*if(AppStartUtil.checkAppStart(this, sharedPreferences) == AppStartUtil.AppStart.NORMAL)
-            return EpisodeDatabase.getInstance(this);*/
+        if(AppStartUtil.checkAppStart(this, sharedPreferences) == AppStartUtil.AppStart.NORMAL)
+            return EpisodeDatabase.getInstance(this);
 
         return EpisodeDatabase.getInstance(this);
     }

@@ -1,12 +1,14 @@
 package com.personal.project.explora.ui.episode_list;
 
+import static com.personal.project.explora.service.PlayerServiceConnection.EMPTY_PLAYBACK_STATE;
+import static com.personal.project.explora.service.PlayerServiceConnection.NOTHING_PLAYING;
+
 import android.app.Application;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -17,21 +19,15 @@ import com.personal.project.explora.BasicApp;
 import com.personal.project.explora.EpisodeRepository;
 import com.personal.project.explora.db.Episode;
 import com.personal.project.explora.service.PlayerServiceConnection;
-import com.personal.project.explora.service.download.DownloadUtil;
 import com.personal.project.explora.utils.DateUtil;
 import com.personal.project.explora.utils.Event;
 import com.personal.project.explora.utils.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import static com.personal.project.explora.service.PlayerServiceConnection.EMPTY_PLAYBACK_STATE;
-import static com.personal.project.explora.service.PlayerServiceConnection.NOTHING_PLAYING;
 
 public class EpisodeListViewModel extends AndroidViewModel {
 
@@ -48,7 +44,6 @@ public class EpisodeListViewModel extends AndroidViewModel {
     private final PlayerServiceConnection playerServiceConnection;
     private final MutableLiveData<Integer> nowPlayingId;
     private final MutableLiveData<Boolean> isPlaying;
-    //private final LiveData<Boolean> networkError;
 
     private final Observer<PlaybackStateCompat> playbackStateObserver;
     private final Observer<MediaMetadataCompat> mediaMetadataObserver;
@@ -199,14 +194,18 @@ public class EpisodeListViewModel extends AndroidViewModel {
     public void download(Episode episode) {
 
         if (((BasicApp)getApplication()).isOnline())
-            DownloadUtil.addDownload(episode, getApplication().getApplicationContext());
+            mRepository.download(episode, getApplication().getApplicationContext());
         else {
             Toast.makeText(getApplication(), "Failed to start download", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void removeDownload(Episode episode) {
-        DownloadUtil.removeDownload(episode, getApplication().getApplicationContext());
+        mRepository.removeDownload(episode, getApplication().getApplicationContext());
+    }
+
+    public void stopDownload(Episode episode) {
+        mRepository.stopDownload(episode, getApplication().getApplicationContext());
     }
 
     public void markAsCompleted(Episode episode) {
