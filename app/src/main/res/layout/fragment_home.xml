@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundHome"
+    android:background="@color/backgroundColor"
     android:fillViewport="true"
     android:orientation="vertical"
     tools:context=".ui.home.HomeFragment">
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/backgroundHome"
+        android:background="@color/backgroundColor"
         android:fillViewport="true"
         tools:context=".ui.home.HomeFragment">
 
@@ -104,21 +104,21 @@
                     android:background="@drawable/circle_button"
                     android:contentDescription="@string/radio_pula_button_desc" />
 
-<!--                <TextView-->
-<!--                    style="@style/HomeLinkTitle"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:paddingTop="8dp"-->
-<!--                    android:text="@string/explorers_club" />-->
+                <TextView
+                    style="@style/HomeLinkTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    android:text="@string/explorers_club" />
 
-<!--                <ImageButton-->
-<!--                    android:id="@+id/explora_button"-->
-<!--                    android:layout_width="@dimen/circle_button_dimen"-->
-<!--                    android:layout_height="@dimen/circle_button_dimen"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:background="@drawable/circle_button"-->
-<!--                    android:backgroundTint="@android:color/holo_orange_dark"-->
-<!--                    android:contentDescription="@string/explora_button_desc" />-->
+                <ImageButton
+                    android:id="@+id/explora_button"
+                    android:layout_width="@dimen/circle_button_dimen"
+                    android:layout_height="@dimen/circle_button_dimen"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circle_button"
+                    android:backgroundTint="@android:color/holo_orange_dark"
+                    android:contentDescription="@string/explora_button_desc" />
 
                 <TextView
                     style="@style/HomeLinkTitle"

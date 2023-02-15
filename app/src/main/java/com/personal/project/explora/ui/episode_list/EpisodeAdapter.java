@@ -1,14 +1,19 @@
 package com.personal.project.explora.ui.episode_list;
 
+import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,12 +25,14 @@ import com.personal.project.explora.utils.StringUtils;
 import com.personal.project.explora.utils.YearsData;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.EpisodeHolder> {
 
     private final EpisodeClickedListener episodeClickedListener;
 
     protected EpisodeAdapter(EpisodeClickedListener episodeClickedListener) {
-        super(PlayableEpisode.DIFF_CALLBACK);
+        super(PlayableEpisode.diffCallback);
         this.episodeClickedListener = episodeClickedListener;
     }
 
@@ -38,53 +45,36 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
         return new EpisodeHolder(itemView);
     }
 
-//    @Override
-//    public void onBindViewHolder(@NonNull EpisodeHolder holder, int position, @NonNull List<Object> payloads) {
-//
-//        PlayableEpisode currentEpisode = getItem(position);
-//        boolean fullRefresh = payloads.isEmpty();
-//
-//        if (!fullRefresh) {
-//            for (int i = 0; i < payloads.size(); i++) {
-//                Bundle payload = (Bundle)payloads.get(i);
-//
-//                if (payload.getInt(PlayableEpisode.DESCRIPTION_CHANGED, -1) != -1)
-//                    holder.textViewDescription.setText(currentEpisode.getDescription());
-//
-//                if (payload.getInt(PlayableEpisode.LAST_POSITION_CHANGED, -1) != -1 ||
-//                        payload.getInt(PlayableEpisode.PLAYBACK_RES_CHANGED, -1) != -1) {
-//                    holder.setLastPositionText(currentEpisode.getPlaybackRes(),
-//                            currentEpisode.isCompleted(), currentEpisode.getLastPosition());
-//
-//                    holder.buttonCompleted.setOnClickListener(v -> {
-//                        Episode clone = new Episode(currentEpisode);
-//                        episodeClickedListener.onCompleteEpisodeClicked(clone); });
-//                    holder.setBackgroundColor(currentEpisode.isCompleted());
-//                    holder.setCompletedButtonResource(currentEpisode.isCompleted());
-//                }
-//
-//                if (payload.getInt(PlayableEpisode.PLAYBACK_RES_CHANGED, -1) != -1)
-//                    holder.buttonPlay.setImageResource(currentEpisode.getPlaybackRes());
-//
-//                if (payload.getInt(PlayableEpisode.DOWNLOAD_STATE_CHANGED, -1) != -1) {
-//                    holder.setDownloadSituation(currentEpisode.getDownloadState());
-//                    holder.buttonDownload.setOnClickListener(v -> {
-//                        Episode clone = new Episode(currentEpisode);
-//                        episodeClickedListener.onDownloadEpisodeClicked(clone);
-//                    });
-//                }
-//
-//                if (payload.getInt(PlayableEpisode.NON_PLAYABLE_CHANGED, -1) != -1)
-//                    holder.setPlayableSituation(currentEpisode.isNonPlayable(),
-//                            currentEpisode.getDownloadState());
-//            }
-//        }
-//
-//        if (fullRefresh) {
-//            onBindViewHolder(holder, position);
-//        }
-//
-//    }
+    @Override
+    public void onBindViewHolder(@NonNull EpisodeHolder holder, int position, @NonNull List<Object> payloads) {
+
+        PlayableEpisode currentEpisode = getItem(position);
+        boolean fullRefresh = payloads.isEmpty();
+
+        if (!fullRefresh) {
+            for (int i = 0; i < payloads.size(); i++) {
+                Bundle payload = (Bundle)payloads.get(i);
+
+                if (payload.getInt(PlayableEpisode.DESCRIPTION_CHANGED, -1) != -1)
+                    holder.textViewDescription.setText(currentEpisode.getDescription());
+
+                if (payload.getInt(PlayableEpisode.LAST_POSITION_CHANGED, -1) != -1 ||
+                        payload.getInt(PlayableEpisode.PLAYBACK_RES_CHANGED, -1) != -1) {
+                    holder.setLastPositionText(currentEpisode.getPlaybackRes(),
+                            currentEpisode.isCompleted(), currentEpisode.getLastPosition());
+                    holder.setBackgroundColor(currentEpisode.isCompleted());
+                }
+
+                if (payload.getInt(PlayableEpisode.PLAYBACK_RES_CHANGED, -1) != -1)
+                    holder.buttonPlay.setImageResource(currentEpisode.getPlaybackRes());
+            }
+        }
+
+        if (fullRefresh) {
+            onBindViewHolder(holder, position);
+        }
+
+    }
 
     @Override
     public void onBindViewHolder(@NonNull EpisodeHolder holder, int position) {
@@ -97,34 +87,39 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
         holder.setDescription(currentEpisode.getDescription());
 
         Picasso.get()
-                .load(YearsData.getYearImageRes())
+                .load(YearsData.getYearImageRes(currentEpisode.getYear()))
                 .into(holder.image);
 
-        holder.buttonShare.setOnClickListener(v ->
-                episodeClickedListener.onShareEpisodeClicked(currentEpisode));
-        holder.buttonShare.setText(R.string.share_button_text);
-
-        holder.buttonDownload.setOnClickListener(v -> {
-            Episode clone = new Episode(currentEpisode);
-            episodeClickedListener.onDownloadEpisodeClicked(clone);
-        });
-        holder.setDownloadSituation(currentEpisode.getDownloadState());
-
-        holder.buttonPlay.setOnClickListener(v -> {
-            Episode clone = new Episode(currentEpisode);
-            episodeClickedListener.onPlayEpisodeClicked(clone);
-        });
+        holder.buttonPlay.setOnClickListener(v ->
+                episodeClickedListener.onPlayEpisodeClicked(currentEpisode));
         holder.buttonPlay.setImageResource(currentEpisode.getPlaybackRes());
+
         holder.setLastPositionText(currentEpisode.getPlaybackRes(),
                 currentEpisode.isCompleted(), currentEpisode.getLastPosition());
 
-        holder.buttonCompleted.setOnClickListener(v -> {
-                Episode clone = new Episode(currentEpisode);
-                episodeClickedListener.onCompleteEpisodeClicked(clone); });
-        holder.setCompletedButtonResource(currentEpisode.isCompleted());
+        holder.buttonMenu.setOnClickListener(v -> showPopupMenu(holder.buttonMenu, position));
 
-        holder.setPlayableSituation(currentEpisode.isNonPlayable(),
-                currentEpisode.getDownloadState());
+        holder.buttonShare.setOnClickListener(v ->
+                episodeClickedListener.onShareEpisodeClicked(currentEpisode));
+    }
+
+    private void showPopupMenu(View view, int position) {
+        PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        Menu menu = popupMenu.getMenu();
+
+        inflater.inflate(R.menu.episode_card_options_menu, menu);
+        popupMenu.setOnMenuItemClickListener(new MenuItemClickListener(position));
+
+        if (getItem(position).getDownloadState() == Episode.DOWNLOADED) {
+            menu.getItem(0).setTitle(R.string.remove_download);
+        }
+
+        if (getItem(position).isCompleted()) {
+            menu.getItem(1).setTitle(R.string.mark_as_not_completed);
+        }
+
+        popupMenu.show();
     }
 
     public interface EpisodeClickedListener {
@@ -144,12 +139,10 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
         private final TextView textViewTitle;
         private final TextView textViewDescription;
         private final TextView textViewLastPosition;
-        private final TextView nonPlayableText;
         private final ImageView image;
-        private final Button buttonShare;
-        private final Button buttonDownload;
         private final ImageButton buttonPlay;
-        private final ImageButton buttonCompleted;
+        private final ImageButton buttonMenu;
+        private final ImageButton buttonShare;
 
         public EpisodeHolder(@NonNull View itemView) {
             super(itemView);
@@ -158,12 +151,10 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
             textViewTitle = itemView.findViewById(R.id.episode_title);
             textViewDescription = itemView.findViewById(R.id.episode_description);
             textViewLastPosition = itemView.findViewById(R.id.episode_last_position);
-            nonPlayableText = itemView.findViewById(R.id.non_playable_text);
             image = itemView.findViewById(R.id.episode_image);
-            buttonShare = itemView.findViewById(R.id.episode_share_button);
-            buttonDownload = itemView.findViewById(R.id.episode_download_button);
             buttonPlay = itemView.findViewById(R.id.episode_play_button);
-            buttonCompleted = itemView.findViewById(R.id.episode_mark_completed_button);
+            buttonMenu = itemView.findViewById(R.id.episode_menu_button);
+            buttonShare = itemView.findViewById(R.id.episode_share_button);
         }
 
         public void setLastPositionText(int playbackRes, boolean isCompleted, long lastPosition) {
@@ -177,69 +168,40 @@ public class EpisodeAdapter extends ListAdapter<PlayableEpisode, EpisodeAdapter.
 
         public void setBackgroundColor(boolean isCompleted) {
             container.setCardBackgroundColor(isCompleted
-                    ? container.getContext().getColor(R.color.completed_card_background)
-                    : container.getContext().getColor(R.color.not_completed_card_background));
+                    ? container.getContext().getResources().getColor(R.color.completed_card_background)
+                    : container.getContext().getResources().getColor(R.color.not_completed_card_background));
         }
 
         public void setDescription(String description) {
-            if (description != null) description = description.trim();
-
             textViewDescription.setText(description);
             if (description == null || description.equals("null"))
                 textViewDescription.setVisibility(View.GONE);
             else
                 textViewDescription.setVisibility(View.VISIBLE);
         }
+    }
 
-        public void setDownloadSituation(int downloadState) {
-            int imgR, textR;
-            switch (downloadState) {
-                case Episode.DOWNLOADED:
-                    imgR = R.drawable.ic_trash;
-                    textR = R.string.remove_download;
-                    break;
-                case Episode.DOWNLOADING:
-                    imgR = R.drawable.ic_stop_download;
-                    textR = R.string.downloading;
-                    break;
-                default:
-                    imgR = R.drawable.ic_download_vec;
-                    textR = R.string.download;
-            }
+    class MenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
+        private final int position;
 
-            buttonDownload.setText(textR);
-            buttonDownload.setCompoundDrawablesRelativeWithIntrinsicBounds(imgR, 0, 0, 0);
+        public MenuItemClickListener(int position) {
+            this.position = position;
         }
 
-        public void setCompletedButtonResource(boolean completed) {
-            if (completed)
-                buttonCompleted.setImageResource(R.drawable.ic_completed);
-            else
-                buttonCompleted.setImageResource(R.drawable.ic_mark_completed);
-        }
-
-        // TODO make adjustments for "CURRENTLY PLAYING"
-        public void setPlayableSituation(boolean nonPlayable, int downloadState) {
-            int downloadVisibility, textViewVisibility, playButtonVisibility, positionVisibility;
-            if (nonPlayable) {
-                if (downloadState == Episode.DOWNLOADED) {
-                    textViewVisibility = View.GONE;
-                    downloadVisibility = playButtonVisibility = positionVisibility = View.VISIBLE;
-                }
-                else {
-                    textViewVisibility = View.VISIBLE;
-                    downloadVisibility = playButtonVisibility = positionVisibility = View.GONE;
-                }
-            }
-            else {
-                textViewVisibility = View.GONE;
-                downloadVisibility = playButtonVisibility = positionVisibility = View.VISIBLE;
+        @SuppressLint("NonConstantResourceId")
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.download_option:
+                    episodeClickedListener.onDownloadEpisodeClicked(getItem(position));
+                    return true;
+                case R.id.complete_option:
+                    Episode clone = new Episode(getItem(position));
+                    episodeClickedListener.onCompleteEpisodeClicked(clone);
+                    return true;
             }
 
-            textViewLastPosition.setVisibility(positionVisibility);
-            buttonDownload.setVisibility(downloadVisibility);
-            nonPlayableText.setVisibility(textViewVisibility);
-            buttonPlay.setVisibility(playButtonVisibility);
+            return false;
         }
     }
 }
