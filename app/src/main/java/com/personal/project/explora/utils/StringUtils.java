@@ -2,11 +2,6 @@ package com.personal.project.explora.utils;
 
 public class StringUtils {
 
-    /**
-     * Checks whether the given string is null or empty
-     * @param obj String to be checked
-     * @return True if string is null or empty, false otherwise
-     */
     public static boolean isEmpty(String obj) {
         return obj == null || obj.isEmpty() || obj.equals("null");
     }

@@ -1,11 +1,2 @@
-Version 2.0.0
-
-- Episode retrieval now functions once again.
-- All present episodes are able to be played.
-- Stopped duplicate episodes from being added when refreshing.
-- Removed archived episodes.
-- On the Home page of the app, re-added functionality to the button links.
-- Added UI strips which notify when the app is online/offline.
-- It is now clear that non-downloaded episodes cannot be played offline.
-- Downloading an episode can now be stopped mid-way.
-- Aesthetic improvements of episode lists and the media player.
+Verzija 1.0.0
+- Prva javna verzija

@@ -11,6 +11,7 @@ import android.view.Gravity;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.PlayerNotificationManager;
 import com.personal.project.explora.AppExecutors;
@@ -38,22 +39,20 @@ public class ExploraPlayerNotificationManager {
 
         mExecutors = ((BasicApp)context).getAppExecutors();
 
-        notificationManager = new PlayerNotificationManager.Builder(context,
+        notificationManager = PlayerNotificationManager.createWithNotificationChannel(
+                context,
+                NOW_PLAYING_CHANNEL_ID,
+                R.string.notification_channel,
+                R.string.notification_channel_description,
                 NOW_PLAYING_NOTIFICATION_ID,
-                NOW_PLAYING_CHANNEL_ID)
-                .setChannelNameResourceId(R.string.notification_channel)
-                .setChannelDescriptionResourceId(R.string.notification_channel_description)
-                .setMediaDescriptionAdapter(new DescriptionAdapter(mediaController, context))
-                .setNotificationListener(notificationListener)
-                .setSmallIconResourceId(R.drawable.ic_play)
-                .build();
-
+                new DescriptionAdapter(mediaController, context),
+                notificationListener);
+        notificationManager.setSmallIcon(R.drawable.ic_play_circle_filled_24);
         notificationManager.setMediaSessionToken(sessionToken);
         notificationManager.setUseStopAction(true);
         notificationManager.setUseChronometer(true);
         notificationManager.setUsePreviousAction(false);
-        notificationManager.setUseRewindAction(true);
-        notificationManager.setUseFastForwardAction(true);
+        notificationManager.setControlDispatcher(new DefaultControlDispatcher(15000, 15000));
     }
 
     public void hideNotification() {
@@ -79,7 +78,6 @@ public class ExploraPlayerNotificationManager {
 
         @Override
         public CharSequence getCurrentContentTitle(Player player) {
-            // TODO
             // My addition! and probably bad practice! The thing is that controller.getMetadata()
             // didn't work for me since the metadata gets updated twice when I start the service:
             // the first time by me and the second time by God knows what. I fixed this in the

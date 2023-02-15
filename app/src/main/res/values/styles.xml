@@ -8,13 +8,6 @@
         <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
-    <!-- MainActivity -->
-    <style name="OnlineText" parent="@android:style/TextAppearance.DeviceDefault">
-        <item name="android:textColor">@color/white</item>
-        <item name="android:fontFamily">@font/montserrat</item>
-        <item name="android:textSize">16sp</item>
-    </style>
-
     <!-- HomeFragment -->
     <style name="HomeText" parent="@android:style/TextAppearance.DeviceDefault">
         <item name="android:textColor">@color/surface_text_color</item>
@@ -43,37 +36,5 @@
         <item name="android:fontFamily">@font/montserrat</item>
         <item name="android:textColor">@color/card_view_text_color</item>
     </style>
-    <style name="ButtonLabel" parent="TextAppearance.AppCompat.Button" >
-        <item name="android:fontFamily">@font/montserrat</item>
-        <item name="android:textColor">@color/card_view_text_color</item>
-    </style>
-    <style name="NonPlayableText" parent="TextAppearance.AppCompat.Body1" >
-        <item name="android:fontFamily">@font/montserrat</item>
-        <item name="android:textColor">@color/gone_wrong_color</item>
-    </style>
-    <style name="ShapeAppearanceOverlay.App.CornerSize5Percent" parent="">
-        <item name="cornerSize">5%</item>
-    </style>
-    <style name="ShapeAppearanceOverlay.App.RectangleCompleted" parent="">
-        <item name="cornerSize">50%</item>
-    </style>
-
-    <!-- PlayerFragment -->
-    <style name="PlayerTitle" parent="TextAppearance.AppCompat.Title">
-        <item name="android:textColor">@color/white</item>
-        <item name="android:fontFamily">@font/montserrat</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">30sp</item>
-    </style>
-
-    <style name="TextAppearance.Uamp.Title" parent="@style/TextAppearance.AppCompat.Title">
-        <item name="android:textColor">?android:textColorSecondary</item>
-    </style>
-
-    <style name="TextAppearance.Uamp.Subtitle" parent="@style/TextAppearance.AppCompat.Small">
-        <item name="android:textColor">?android:textColorSecondary</item>
-    </style>
-
-
 
 </resources>

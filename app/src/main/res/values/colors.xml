@@ -1,29 +1,14 @@
 <!--?xml version="1.0" encoding="UTF-8"?-->
 <resources>
-  <color name="white">#ffffff</color>
-
   <color name="primaryColor">#0277bd</color>
   <color name="primaryLightColor">#58a5f0</color>
   <color name="primaryDarkColor">#004c8c</color>
 
-  <color name="secondaryColor">#fbe9e7</color>
-  <color name="secondaryLightColor">#ffddc1</color>
-  <color name="secondaryDarkColor">#c97b63</color>
-  
-  <color name="backgroundColor">#FBFBFB</color>
-  <color name="backgroundHome">#EEF8FF</color>
+  <color name="backgroundColor">#ebf6fc</color>
 
   <color name="surface_text_color">#263238</color>
   <color name="card_view_text_color">#53595c</color>
 
   <color name="not_completed_card_background">#ffffff</color>
-  <color name="completed_card_background">#ECECEC</color>
-  <color name="completed_button_color">#AED581</color>
-
-  <color name="gone_wrong_color">#EF9A9A</color>
-  <color name="gone_right_color">#A5D6A7</color>
-
-  <color name="seek_bar_background">#17396E</color>
-  <color name="seek_bar_secondary_progress">#1E88E5</color>
-  <color name="seek_bar_progress">#1E88E5</color>
+  <color name="completed_card_background">#b9c3c9</color>
 </resources>

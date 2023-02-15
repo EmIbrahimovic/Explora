@@ -25,8 +25,8 @@
     <string name="version_code">Broj verzije</string>
     <string name="home_description"><a href="https://hr.wikipedia.org/wiki/Korado_Korlevi%C4%87">Korado Korlević</a> u Explori odgovora na brojna pitanja i zagonetke svijeta oko nas. Zanimljive i kontroverzne teme, znanstve novosti, povijesne zagonetke i trendovi razvoja tehnologije. U emisiju se svojim pitanjima mogu uključiti i slušatelji. \nUrednik i voditelj Elvis Mileta.</string>
     <string name="other_talks">Predavanja Korada Korlevića</string>
-    <string name="author">Autorica: <a href="https://github.com/EmIbrahimovic/">Emira Ibrahimović</a></string>
-    <string name="an_error_occurred">Došlo je do neočekivane greške.</string>
+    <string name="author">Autor: <a href="https://github.com/EmIbrahimovic">Emira Ibrahimović</a></string>
+    <string name="an_error_occurred">Došlo je do greške</string>
     <string name="visnjan_button_desc">Link na web stranicu Zvjezdarnice Višnjan</string>
     <string name="visnjan_fb_button_desc">Link na Facebook stranicu Zvjezdarnice Višnjan</string>
     <string name="radio_pula_button_desc">Link na web stranicu Radio Pule</string>
@@ -39,12 +39,4 @@
     <string name="rewind_button">Dugme za premotavanje unazad</string>
     <string name="fast_forward_button">Dugme za premotavanje unaprijed</string>
     <string name="question_text">Postavi pitanje u emisiju:</string>
-    <string name="share_text">Poslušajte emisiju Explore</string>
-    <string name="mark_as_completed_button">\"Označi kao preslušano\" dugme</string>
-    <string name="share_button_text">Podijeli</string>
-    <string name="download_button_text">Preuzmi</string>
-    <string name="download_button">Dugme za preuzimanje</string>
-    <string name="non_playable_text">Online audio trenutno nedostupan</string>
-    <string name="downloading">Preuzimanje…</string>
-    <string name="back_button">Dugme \"natrag\"</string>
 </resources>

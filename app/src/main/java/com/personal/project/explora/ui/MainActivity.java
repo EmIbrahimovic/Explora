@@ -22,8 +22,6 @@ public class MainActivity extends AppCompatActivity {
     Fragment playerFragmentCurrent;
     ActivityMainBinding mBinding;
 
-    private static final long ONLINE_TV_DELAY = 3000;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,22 +70,6 @@ public class MainActivity extends AppCompatActivity {
             if (show != null) {
                 if (show) mBinding.navView.setVisibility(View.VISIBLE);
                 else mBinding.navView.setVisibility(View.GONE);
-            }
-        });
-
-        mViewModel.getNetworkAvailability().observe(this, available -> {
-            if (available == null) return;
-            if (available) {
-                mBinding.onlineStatus.setBackgroundColor(getColor(R.color.gone_right_color));
-                mBinding.onlineStatus.setText(getString(R.string.online));
-                mBinding.onlineStatus.setVisibility(View.VISIBLE);
-                mBinding.onlineStatus.postDelayed(() ->
-                        mBinding.onlineStatus.setVisibility(View.GONE), ONLINE_TV_DELAY);
-            }
-            else {
-                mBinding.onlineStatus.setBackgroundColor(getColor(R.color.gone_wrong_color));
-                mBinding.onlineStatus.setText(getString(R.string.offline));
-                mBinding.onlineStatus.setVisibility(View.VISIBLE);
             }
         });
 
