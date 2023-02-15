@@ -1,11 +1,9 @@
 package com.personal.project.explora;
 
 import android.app.Application;
-import android.content.Context;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -15,16 +13,16 @@ import com.personal.project.explora.db.EpisodeDao;
 import com.personal.project.explora.db.EpisodeDatabase;
 import com.personal.project.explora.feed.Channel;
 import com.personal.project.explora.feed.FeedAPI;
-import com.personal.project.explora.feed.Item;
 import com.personal.project.explora.feed.Rss;
 import com.personal.project.explora.service.download.DownloadUtil;
-import com.personal.project.explora.utils.DateUtil;
 import com.personal.project.explora.utils.StringUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,10 +41,11 @@ public class EpisodeRepository {
     private final EpisodeDao episodeDao;
     private final FeedAPI feedAPI;
 
-    private static final String BASE_URL = "https://feed.hrt.hr/";
-    private static final String FEED_URL = "https://feed.hrt.hr/podcast/explora.xml";
+    private static final String BASE_URL = "https://radio.hrt.hr/";
+    private static final String FEED_URL = "https://radio.hrt.hr/podcast/rss/radio-pula/1277/explora.xml";
 
-    private final LiveData<List<Integer>> years;
+    private final Map<Integer, LiveData<List<Episode>>> allEpisodes;
+    private List<Episode> recents;
 
     private final MutableLiveData<Integer> networkOperationSucceeded;
     public static final int SUCCESS = 1;
@@ -70,7 +69,7 @@ public class EpisodeRepository {
         networkOperationSucceeded = new MutableLiveData<>();
         networkOperationSucceeded.postValue(null);
 
-        years = episodeDao.getYears();
+        allEpisodes = populateEpisodeMap();
     }
 
     public static EpisodeRepository getInstance(Application application, AppExecutors executors) {
@@ -87,6 +86,7 @@ public class EpisodeRepository {
 
     private FeedAPI buildFeedAPI() {
 
+        //noinspection deprecation
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(SimpleXmlConverterFactory.create())
@@ -96,16 +96,21 @@ public class EpisodeRepository {
         return retrofit.create(FeedAPI.class);
     }
 
+    private Map<Integer, LiveData<List<Episode>>> populateEpisodeMap() {
+
+        Map<Integer, LiveData<List<Episode>>> episodeMap = new HashMap<>();
+        for (int year = 2017; year < 2022; year++) {
+            episodeMap.put(year, episodeDao.getEpisodesFromYear(year));
+        }
+        return episodeMap;
+    }
+
     /*
         GETTERS
      */
 
-    public LiveData<List<Integer>> getYears() {
-        return years;
-    }
-
-    public LiveData<List<Episode>> getEpisodesFromYear(int year) {
-        return episodeDao.getEpisodesFromYear(year);
+    public Map<Integer, LiveData<List<Episode>>> getAllEpisodes() {
+        return allEpisodes;
     }
 
     public LiveData<List<Episode>> getRecentEpisodes() {
@@ -132,10 +137,6 @@ public class EpisodeRepository {
         mExecutors.diskIO().execute(() -> episodeDao.update(episode));
     }
 
-    public void delete(final Episode episode) {
-        mExecutors.diskIO().execute(() -> episodeDao.delete(episode));
-    }
-
     /** very special use case with a probably better solution but hey */
     public void getEpisodeFromIdForPrepare(int id, EpisodeRetrievedListenerForPrepare listener,
                                            boolean playWhenReady, Bundle extras) {
@@ -153,10 +154,8 @@ public class EpisodeRepository {
 
         mExecutors.diskIO().execute(() -> {
             Episode episode = episodeDao.getEpisodeSync(id);
-            if (episode != null) {
-                episode.setDownloadState(downloadId);
-                update(episode);
-            }
+            episode.setDownloadState(downloadId);
+            update(episode);
         });
     }
 
@@ -164,7 +163,6 @@ public class EpisodeRepository {
     public void updateDownloads(List<Integer> downloadedIds) {
         mExecutors.diskIO().execute(() -> {
 
-            Log.d(TAG, "updateDownloads: updating the initial download state");
             List<Integer> currentlyDownloaded = episodeDao.getDownloadedEpisodesIdSync();
             for (Integer id : currentlyDownloaded) {
                 if (!downloadedIds.contains(id))
@@ -183,7 +181,7 @@ public class EpisodeRepository {
         NETWORK OPERATIONS
      */
 
-    public void refreshNewEpisodes() {
+    public void refreshRecents() {
 
         networkOperationSucceeded.postValue(LOADING);
 
@@ -191,92 +189,63 @@ public class EpisodeRepository {
         rssCall.enqueue(new Callback<Rss>() {
             @Override
             public void onResponse(@NotNull Call<Rss> call, @NotNull Response<Rss> response) {
-                Log.d(TAG, "onResponse: " + response.code());
+                //Log.d(TAG, "onResponse: " + response.code());
                 if (!response.isSuccessful() || response.body() == null) {
                     networkOperationSucceeded.postValue(FAILURE);
                     return;
                 }
 
                 Channel channel = response.body().getChannel();
+                recents = channel.getEpisodes();
 
-                updateDBWithItems(channel.getItems());
+                // updateDB posts success
+                updateDB(recents);
             }
 
             @Override
             public void onFailure(@NotNull Call<Rss> call, @NotNull Throwable t) {
-                Log.e(TAG, "onFailure: Unable to retrieve RSS " + t.getMessage());
+                //Log.e(TAG, "onFailure: Unable to retrieve RSS " + t.getMessage());
                 networkOperationSucceeded.postValue(FAILURE);
             }
         });
     }
 
-    private void updateDBWithItems(List<Item> items) {
+    private void updateDB(List<Episode> recentEpisodes) {
 
         mExecutors.networkIO().execute(() -> {
+            List<Episode> toInsert = new ArrayList<>();
+            for (Episode recentEpisode : recentEpisodes) {
+                Episode lookup = episodeDao.getEpisodeByTitle(recentEpisode.getTitle());
+                recentEpisode.setDuration(getDuration(recentEpisode));
 
-            // STEP 1: Check if all episodes currently in my database still exist in the RSS feed
-            List<Episode> currentEpisodeList = episodeDao.getEpisodesSync();
-            if (currentEpisodeList != null) {
-                for (Episode episode : currentEpisodeList) {
-                    Log.d(TAG, "updateDBWithItems: STEP 1 processing " + episode);
-                    boolean found = false;
-                    for (Item item : items) {
-                        if (DateUtil.formatMyDate(DateUtil.parse(item.getDate())).equals(
-                                episode.getDatePublished())) {
-                            found = true;
-                            break;
-                        }
+                if (lookup == null) {
+                    if (!StringUtils.isEmpty(recentEpisode.getLink())) {
+                        toInsert.add(recentEpisode);
                     }
+                }
+                else if (lookup.areContentsComplete()) {
+                    break;
+                }
+                else if (recentEpisode.completes(lookup)) {
 
-                    if (!found)
-                        delete(episode);
-                    else
-                        Log.d(TAG, "updateDBWithItems: STEP 1 episode found");
+                    lookup.completeContentWith(recentEpisode);
+
+                    update(lookup);
                 }
             }
 
-            // STEP 2: Add episodes from the RSS feed to my database if needed
-            //         Mark episodes as unplayable if necessary
-            for (Item item : items) {
-                Log.d(TAG, "updateDBWithItems: processing item " + item);
-
-                long duration = item.getDuration() * 1000 - 4000;
-                try {
-                    duration = getDuration(item.getLink());
-                } catch (Exception e) {
-                    Log.e(TAG, "updateDBWithItems: getDuration throws error " + e.getMessage());
-                }
-
-                Episode newEpisode = new Episode(
-                        item.getYear(),
-                        item.getDescription(),
-                        item.getLink(),
-                        item.getShareLink(),
-                        DateUtil.formatMyDate(DateUtil.parse(item.getDate())),
-                        duration
-                );
-
-                Episode lookup = episodeDao.getEpisodeByDatePublished(newEpisode.getDatePublished());
-
-                if (lookup == null) {
-                    if (!StringUtils.isEmpty(newEpisode.getLink())) {
-                        insert(newEpisode);
-                    }
-                }
-                else if (newEpisode.completes(lookup)) {
-                    lookup.completeContentWith(newEpisode);
-                    update(lookup);
-                }
+            for (int i = toInsert.size() - 1; i >= 0; i--) {
+                insert(toInsert.get(i));
             }
 
             mExecutors.diskIO().execute(() -> networkOperationSucceeded.postValue(SUCCESS));
         });
     }
 
-    private long getDuration(String episodeLink) {
+    private long getDuration(Episode episode) {
 
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(episodeLink, new HashMap<String, String>());
+        retriever.setDataSource(episode.getLink(), new HashMap<>());
 
         return Long.parseLong(
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
@@ -289,19 +258,4 @@ public class EpisodeRepository {
         void onEpisodeRetrieved(Episode episode, boolean playWhenReady, Bundle extras);
     }
 
-    /*
-    DOWNLOAD OPERATIONS
-     */
-
-    public void download(Episode episode, Context applicationContext) {
-        DownloadUtil.addDownload(episode, applicationContext);
-    }
-
-    public void removeDownload(Episode episode, Context applicationContext) {
-        DownloadUtil.removeDownload(episode, applicationContext);
-    }
-
-    public void stopDownload(Episode episode, Context applicationContext) {
-        DownloadUtil.stopDownload(episode, applicationContext);
-    }
 }

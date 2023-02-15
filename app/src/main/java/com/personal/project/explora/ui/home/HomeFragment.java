@@ -1,5 +1,6 @@
 package com.personal.project.explora.ui.home;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -54,12 +55,12 @@ public class HomeFragment extends Fragment {
                 .fit()
                 .into(button3);
 
-/*        ImageButton button4 = root.findViewById(R.id.explora_button);
+        ImageButton button4 = root.findViewById(R.id.explora_button);
         Picasso.get()
                 .load(R.drawable.ic_explora_society)
                 .centerInside()
                 .fit()
-                .into(button4);*/
+                .into(button4);
 
         ImageButton button5 = root.findViewById(R.id.yt_button);
         Picasso.get()
@@ -71,7 +72,7 @@ public class HomeFragment extends Fragment {
         button1.setOnClickListener(v -> openLink(0));
         button2.setOnClickListener(v -> openLink(1));
         button3.setOnClickListener(v -> openLink(2));
-//        button4.setOnClickListener(v -> openLink(3));
+        button4.setOnClickListener(v -> openLink(3));
         button5.setOnClickListener(v -> openLink(4));
 
         TextView homeDescription = root.findViewById(R.id.home_description);
@@ -92,9 +93,12 @@ public class HomeFragment extends Fragment {
         return new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
     }
 
+    @SuppressLint("QueryPermissionsNeeded")
     private void openLink(int pos) {
         Intent intent = createBrowserIntent(LINKS[pos]);
-        startActivity(intent);
+        if (intent.resolveActivity(requireActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     private void openDialog() {

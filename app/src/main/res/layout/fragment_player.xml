@@ -3,176 +3,127 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:focusable="true"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:context=".ui.player.PlayerFragment">
 
-        <ImageButton
-            android:id="@+id/back_arrow"
-            android:layout_width="wrap_content"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/player_fragment_toolbar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:background="?attr/selectableItemBackground"
-            android:contentDescription="@string/back_button"
-            android:src="@drawable/ic_back_arrow"
-            app:layout_constraintBottom_toTopOf="@id/guideline"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/primaryColor"/>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/online_status"
-            style="@style/OnlineText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/online_bubble"
+            android:background="@color/primaryColor"
             android:gravity="center"
-            android:padding="@dimen/medium_element_margin"
-            android:text="@string/online"
-            app:layout_constraintBottom_toTopOf="@id/guideline"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_begin="68dp" />
-
-        <ImageView
-            android:id="@+id/album_art"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:contentDescription="@string/album_art"
-            android:src="@drawable/pic_2022"
-            app:layout_constraintBottom_toTopOf="@id/player_controls"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline" />
+            android:elevation="4dp"
+            app:titleTextColor="@color/exo_white" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/player_controls"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/primaryColor"
-            android:gravity="center_vertical"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.33"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent">
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/title"
-                style="@style/PlayerTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/episode_title"
-                app:layout_constraintBottom_toTopOf="@id/all_player"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/album_art"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@id/player_controls"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:contentDescription="@string/album_art" />
 
             <LinearLayout
-                android:id="@+id/all_player"
+                android:id="@+id/player_controls"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toTopOf="@id/guideline3"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/title">
+                android:background="@color/primaryColor"
+                android:paddingVertical="@dimen/margin_thing"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/album_art">
 
-            <LinearLayout
-                android:id="@+id/seekBarLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/position"
-                    android:layout_width="@dimen/thickest_timestamp"
+                <LinearLayout
+                    android:id="@+id/seekBarLayout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:gravity="end"
-                    android:maxLines="1"
-                    android:textColor="@android:color/white"
-                    tools:text="0:00" />
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
-                <SeekBar
-                    android:id="@+id/seekBar"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="16"
-                    android:thumb="@drawable/ic_progress_thumb" />
+                    <TextView
+                        android:id="@+id/position"
+                        android:layout_width="@dimen/thickest_timestamp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/white"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="end"
+                        android:maxLines="1"
+                        tools:text="0:00" />
 
-                <TextView
-                    android:id="@+id/duration"
-                    android:layout_width="@dimen/thickest_timestamp"
+                    <SeekBar
+                        android:id="@+id/seekBar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="16" />
+
+                    <TextView
+                        android:id="@+id/duration"
+                        android:layout_width="@dimen/thickest_timestamp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/white"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="start"
+                        android:maxLines="1"
+                        tools:text="0:00" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/transport_controls"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:gravity="start"
-                    android:maxLines="1"
-                    android:textColor="@android:color/white"
-                    tools:text="0:00" />
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/rewind_button"
+                        android:layout_width="@dimen/exo_media_button_width"
+                        android:layout_height="@dimen/exo_media_button_height"
+                        android:background="?attr/selectableItemBackground"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/exo_icon_rewind"
+                        android:contentDescription="@string/rewind_button" />
+
+                    <ImageButton
+                        android:id="@+id/media_button"
+                        android:layout_width="@dimen/exo_media_button_width"
+                        android:layout_height="@dimen/exo_media_button_height"
+                        android:background="?attr/selectableItemBackground"
+                        android:scaleType="centerInside"
+                        android:contentDescription="@string/play_pause_button" />
+
+                    <ImageButton
+                        android:id="@+id/fast_forward_button"
+                        android:layout_width="@dimen/exo_media_button_width"
+                        android:layout_height="@dimen/exo_media_button_height"
+                        android:background="?attr/selectableItemBackground"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/exo_icon_fastforward"
+                        android:contentDescription="@string/fast_forward_button" />
+
+                </LinearLayout>
             </LinearLayout>
 
-
-            <LinearLayout
-                android:id="@+id/transport_controls"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/rewind_button"
-                    android:layout_width="@dimen/exo_media_button_width"
-                    android:layout_height="@dimen/exo_media_button_height"
-                    android:background="?attr/selectableItemBackground"
-                    android:contentDescription="@string/rewind_button"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_fast_rewind" />
-
-                <ImageButton
-                    android:id="@+id/media_button"
-                    android:layout_width="@dimen/exo_media_button_width"
-                    android:layout_height="@dimen/exo_media_button_height"
-                    android:background="?attr/selectableItemBackground"
-                    android:contentDescription="@string/play_pause_button"
-                    android:scaleType="centerInside" />
-
-                <ImageButton
-                    android:id="@+id/fast_forward_button"
-                    android:layout_width="@dimen/exo_media_button_width"
-                    android:layout_height="@dimen/exo_media_button_height"
-                    android:background="?attr/selectableItemBackground"
-                    android:contentDescription="@string/fast_forward_button"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_fast_forward" />
-
-            </LinearLayout>
-
-            </LinearLayout>
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_end="32dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </layout>

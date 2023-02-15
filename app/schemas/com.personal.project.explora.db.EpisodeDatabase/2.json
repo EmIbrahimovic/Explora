@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "6c3feece81ab7173d93fdcda2c0998e0",
+    "identityHash": "37700b3314fe65c4c9cef07c8af9b8fe",
     "entities": [
       {
         "tableName": "episodes_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `description` TEXT, `link` TEXT, `shareLink` TEXT, `datePublished` TEXT, `downloadId` INTEGER NOT NULL, `lastPosition` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `recent` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `description` TEXT, `link` TEXT, `datePublished` TEXT, `downloadId` INTEGER NOT NULL, `lastPosition` INTEGER NOT NULL, `duration` INTEGER NOT NULL, `recent` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -29,12 +29,6 @@
           {
             "fieldPath": "link",
             "columnName": "link",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "shareLink",
-            "columnName": "shareLink",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -82,7 +76,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6c3feece81ab7173d93fdcda2c0998e0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '37700b3314fe65c4c9cef07c8af9b8fe')"
     ]
   }
 }

@@ -45,7 +45,7 @@ public class ExploraPlayerNotificationManager {
                 .setChannelDescriptionResourceId(R.string.notification_channel_description)
                 .setMediaDescriptionAdapter(new DescriptionAdapter(mediaController, context))
                 .setNotificationListener(notificationListener)
-                .setSmallIconResourceId(R.drawable.ic_play)
+                .setSmallIconResourceId(R.drawable.ic_play_circle_filled)
                 .build();
 
         notificationManager.setMediaSessionToken(sessionToken);
