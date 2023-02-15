@@ -14,16 +14,16 @@ public class Item implements Serializable {
 
     @Element(name = "title")
     private final String title;
-
+    private final long fileSize;
     @Element(name = "link")
     private final String shareLink;
-    private final String link;
     @Element(name = "description", required = false)
     private final String description;
     @Element(name = "pubDate")
     private final String date;
-    @Element(name = "duration")
-    private final long duration;
+    private final String link;
+    //@Element(name = "duration", required = false)
+    //private long duration;
     @Element(name = "enclosure")
     private Enclosure enclosure;
 
@@ -31,14 +31,15 @@ public class Item implements Serializable {
                 @Element(name = "enclosure") Enclosure enclosure,
                 @Element(name = "link") String shareLink,
                 @Element(name = "description", required = false) String description,
-                @Element(name = "pubDate") String date,
-                @Element(name = "duration") long duration) {
+                @Element(name = "pubDate") String date/*,
+                @Element(name = "duration", required = false) long duration*/) {
         this.title = title;
         this.link = enclosure.url;
         this.shareLink = shareLink;
         this.description = description;
         this.date = date;
-        this.duration = duration;
+        this.fileSize = enclosure.length;
+        //this.duration = duration;
     }
 
     public String getTitle()
@@ -62,9 +63,11 @@ public class Item implements Serializable {
         return date;
     }
 
-    public long getDuration() {
-        return duration;
-    }
+//    public long getDuration() {
+//        return duration;
+//    }
+
+    public long getFileSize() { return fileSize; }
 
     public int getYear() {
         LocalDate date = DateUtil.parse(this.getDate());
@@ -79,7 +82,8 @@ public class Item implements Serializable {
                 ", link='" + link + '\'' +
                 ", description='" + description + '\'' +
                 ", date='" + date + '\'' +
-                ", duration=" + duration +
+                ", fileSize=" + fileSize +
+                //", duration=" + duration +
                 '}';
     }
 

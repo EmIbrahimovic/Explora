@@ -240,7 +240,8 @@ public class EpisodeRepository {
             for (Item item : items) {
                 Log.d(TAG, "updateDBWithItems: processing item " + item);
 
-                long duration = item.getDuration() * 1000 - 4000;
+                // long duration = item.getDuration() * 1000 - 4000;
+                long duration = (item.getFileSize() * 8) / 96;
                 try {
                     duration = getDuration(item.getLink());
                 } catch (Exception e) {
